@@ -1,0 +1,29 @@
+{
+  "name": "Techstore-Stripe-edition",
+  "version": "1.0.0",
+  "description": "Implementation of Stripe",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DWMi/Techstore-Stripe-edition.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DWMi/Techstore-Stripe-edition/issues"
+  },
+  "homepage": "https://github.com/DWMi/Techstore-Stripe-edition#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "express": "^4.18.1",
+    "node-fetch": "^3.2.10",
+    "nodemon": "^2.0.19",
+    "stripe": "^10.8.0"
+  }
+}
