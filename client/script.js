@@ -28,8 +28,6 @@ function getProductPrices() {
         });
 }
 
-
-
 /* Use the data to create a list of these object on your website */
 function createUIFromLoadedItemsData() {
     if (isItemsViewVisible) { return; }
@@ -41,6 +39,7 @@ function createUIFromLoadedItemsData() {
    
     itemsData.data.forEach(product => {
         let priceObj = priceArr.find(price => price.id == product.default_price)
+        console.log(priceObj)
         list.appendChild(createListItem(product, priceObj))
     });
 
