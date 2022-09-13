@@ -1,5 +1,5 @@
 var itemsData;
-let prices;
+let priceArr;
 var shoppingCart = [];
 var isItemsViewVisible = false;
 
@@ -11,32 +11,37 @@ fetch("http://localhost:3000/products")
     .then(function (data) {
         itemsData = data;
         console.log(itemsData)
-        createUIFromLoadedItemsData();
+        getProductPrices()
     });
 
 // FETCH PRICES
+function getProductPrices() {
+    fetch("http://localhost:3000/prices")
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            let prices = data;
+            priceArr = prices.data
+            console.log(priceArr)
+            createUIFromLoadedItemsData();
+        });
+}
 
-fetch("http://localhost:3000/prices")
-    .then(function (response) {
-        return response.json();
-    })
-    .then(function (data) {
-        prices = data;
-        console.log(prices.data[0].product)
-    });
+
 
 /* Use the data to create a list of these object on your website */
 function createUIFromLoadedItemsData() {
     if (isItemsViewVisible) { return; }
     isItemsViewVisible = true;
-
+    
     /* Create a list of the products */
     var list = document.createElement("ul");
 
-  
    
     itemsData.data.forEach(product => {
-        list.appendChild(createListItem(product))
+        let priceObj = priceArr.find(price => price.id == product.default_price)
+        list.appendChild(createListItem(product, priceObj))
     });
 
 
@@ -49,37 +54,35 @@ function createUIFromLoadedItemsData() {
     }
 }
 
-function createListItem(product) {
-   
- 
+function createListItem(product, priceObj) {
+    
     /* Title */
     var title = document.createElement("h3");
     title.innerText = product.name;
-
+    
     /* Description */
     var description = document.createElement("p");
-    description.innerText = product.description
-
+    description.innerText = product.description;
+    
     /* Image */
     var image = document.createElement("img");
     image.src = product.images[0]
 
-    priceArr = prices.data
 
-/*     const productPrice = prices.data.find(price => price.product == product.id)
- */
-    console.log(priceArr)
+
     /* Price */
-    
-    var price = document.createElement("span");
-    price.innerText = '100lkr'
+
+    let priceString = priceObj.unit_amount.toString()
+    if(priceObj) {
+        var price = document.createElement("span");
+        price.innerText = `${priceString.substring(0, priceString.length - 2)} kr`
+    }
 
     /* Button */
     var button = document.createElement("button");
     button.innerHTML = '<i class="fa fa-cart-arrow-down" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Lägg till i kundvagnen";
-    button.onclick = function () {
+    button.onclick = function() {
         shoppingCart.push(product);
-        console.log(shoppingCart)
         counter = document.querySelector("#counter");
         counter.innerText = shoppingCart.length;
     };
@@ -102,16 +105,16 @@ function showShoppingCart() {
     /* Header */
     var header = document.createElement("h2");
     header.innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i>' + " Kundvagn";
-
+    
     /* Shopping list */
     var list = document.createElement("ul");
-    for (var index = 0; index < shoppingCart.length; index++) {
+    for(var index = 0; index < shoppingCart.length; index++) {
         list.appendChild(createShoppingCartItem(shoppingCart[index], index));
     }
-
+    
     /* Shopping info & action */
     var info = createShoppingSummary();
-
+    
     var content = document.createElement("div");
     content.appendChild(header);
     content.appendChild(list);
@@ -133,11 +136,11 @@ function createShoppingCartItem(itemData, index) {
     /* Price */
     var price = document.createElement("span");
     price.innerText = "" + itemData.price + " kr";
-
+    
     /* Button */
     var button = document.createElement("button");
     button.innerHTML = '<i class="fa fa-trash-o" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Ta bort";
-    button.onclick = function () {
+    button.onclick = function() {
         /* Remove the item from the array */
         shoppingCart.splice(index, 1);
         /* Update the counter */
@@ -160,16 +163,16 @@ function createShoppingCartItem(itemData, index) {
 function createShoppingSummary() {
     /* Total price */
     var totalPrice = 0;
-    for (var i = 0; i < shoppingCart.length; i++) {
+    for(var i = 0; i < shoppingCart.length; i++) {
         totalPrice += shoppingCart[i].price;
     }
     var priceLabel = document.createElement("h2");
     priceLabel.innerText = "Totalt pris: " + totalPrice + " kr";
-
+    
     /* Proceed button */
     var proceedButton = document.createElement("button");
     proceedButton.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Slutför ditt köp";
-    proceedButton.onclick = function () {
+    proceedButton.onclick = function() {
         alert("Tack för din beställning, vi önskar dig en fin kväll! Ses snart igen =)");
     };
 
