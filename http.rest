@@ -1,0 +1,25 @@
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "username":"fuckoff",
+    "password":"dasd"
+}
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "username":"fuckoff",
+    "password":"dasd"
+}
+
+###
+GET http://localhost:3000/users
+
+###
+GET http://localhost:3000/login
+
+### 
+DELETE http://localhost:3000/login
