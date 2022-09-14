@@ -1,3 +1,4 @@
+
 var itemsData;
 let priceArr;
 let shoppingCart;
@@ -7,6 +8,8 @@ if(localStorage.getItem('products')) {
      shoppingCart = [];
 }
 var isItemsViewVisible = false;
+
+
 
 /* Fetch data from the json file into a javascript object */
 fetch("http://localhost:3000/products")
@@ -237,10 +240,35 @@ function createShoppingSummary() {
     var proceedButton = document.createElement("button");
     proceedButton.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Slutför ditt köp";
     proceedButton.onclick = function () {
-        /* alert("Tack för din beställning, vi önskar dig en fin kväll! Ses snart igen =)"); */
-
-        console.log(shoppingCart)
+        console.log(shoppingCart);
+        
     };
+
+    proceedButton.addEventListener("click", () => {
+        console.log(shoppingCart);
+      fetch("http://localhost:3000/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          shoppingCart,
+        }),
+      })
+        .then(res => {
+          if (res.ok) return res.json()
+          return res.json().then(json => Promise.reject(json))
+        })
+        .then(({ url }) => {
+          window.location = url
+        })
+        .catch(e => {
+          console.error(e.error)
+        })
+    })
+
+  
+
 
     var info = document.createElement("div");
     info.appendChild(priceLabel);
