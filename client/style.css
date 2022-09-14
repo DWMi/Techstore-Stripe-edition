@@ -142,6 +142,9 @@ button:hover {
     display: flex;
     justify-content:flex-end ;
     padding: 5px;
+}
+.exitSignInForm{
+    cursor:pointer;
 
 }
 /* ---------------SIGN UP STUFF--------------- */
@@ -193,7 +196,10 @@ button:hover {
     display: flex;
     justify-content:flex-end ;
     padding: 5px;
-
+   
+}
+.exitSignUpForm{
+     cursor:pointer
 }
 /*------------------MQ-------------------- */
 @media (max-width: 640px) {
