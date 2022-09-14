@@ -142,6 +142,9 @@ button:hover {
     display: flex;
     justify-content:flex-end ;
     padding: 5px;
+}
+.exitSignInForm{
+    cursor:pointer;
 
 }
 /* ---------------SIGN UP STUFF--------------- */
@@ -186,14 +189,17 @@ button:hover {
     font-size: 15px;
 }
 
-.signUpUsername, .signUpPassword{
+.signUpUsername, .signUpPassword, .signUpEmail{
     font-size: 20px;
 }
 .exitSignUpFormCon{
     display: flex;
     justify-content:flex-end ;
     padding: 5px;
-
+   
+}
+.exitSignUpForm{
+     cursor:pointer
 }
 /*------------------MQ-------------------- */
 @media (max-width: 640px) {

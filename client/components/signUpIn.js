@@ -24,11 +24,12 @@ const signUpForm =()=>{
         signUpForm = document.createElement('div'),
         signUpUsername = document.createElement('input'),
         signUpPassword = document.createElement('input'),
+        signUpEmail = document.createElement('input'),
         signUpSubmitBtn = document.createElement('button'),
         exitSignUpFormCon = document.createElement('div'),
         exitSignUpForm = document.createElement('div')
 
-
+        signUpEmail.classList.add('signUpEmail')
         signUpCover.classList.add('signUpCover')
         signUpFormCon.classList.add('signUpFormCon')
         signUpForm.classList.add('signUpForm')
@@ -44,15 +45,18 @@ const signUpForm =()=>{
         signUpFormCon.append(signUpForm)
         signUpForm.append(exitSignUpFormCon)
         exitSignUpFormCon.append(exitSignUpForm)
+        signUpForm.append(signUpEmail)
         signUpForm.append(signUpUsername)
         signUpForm.append(signUpPassword)
         signUpForm.append(signUpSubmitBtn)  
 
-
         exitSignUpForm.innerText ='❌'
         signUpUsername.placeholder = 'Username'
         signUpPassword.placeholder = 'Password'
+        signUpEmail.placeholder = 'Email'
+        signUpEmail.type ='Email'
         signUpPassword.type = 'Password'
+        signUpEmail.setAttribute('required','')
         signUpUsername.setAttribute('required','')
         signUpPassword.setAttribute('required','')
         signUpSubmitBtn.innerHTML = 'Sign Up'

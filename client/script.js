@@ -246,24 +246,27 @@ function createShoppingSummary() {
 
     proceedButton.addEventListener("click", () => {
         console.log(shoppingCart);
-      fetch("http://localhost:3000/checkout", {
+        
+        fetch("http://localhost:3000/checkout", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          shoppingCart,
+            shoppingCart,
         }),
-      })
-        .then(res => {
-          if (res.ok) return res.json()
-          return res.json().then(json => Promise.reject(json))
+        })
+        .then(async res => {
+            if (res.ok) return res.json()
+            const json = await res.json();
+            return await Promise.reject(json);
         })
         .then(({ url }) => {
-          window.location = url
+            window.location = url
+            
         })
         .catch(e => {
-          console.error(e.error)
+            console.error(e.error)
         })
     })
 
@@ -276,3 +279,10 @@ function createShoppingSummary() {
 
     return info;
 }
+setTimeout(() => {
+              
+    if(window.location.href === "http://localhost:3000/cancel.html"){
+      window.location.href = "http://localhost:3000/"
+      console.log('url')
+      }
+},1500);
