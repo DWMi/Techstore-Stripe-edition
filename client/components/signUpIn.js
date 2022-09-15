@@ -1,8 +1,17 @@
+/* import fetch from "node-fetch" */
+
+fetch("http://localhost:3000/checkLogin")
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (data) {
+        console.log(data)
+    });
+
 const rightItems = document.querySelector('.rightItems'),
 accountStuff = document.createElement('div'),
 signInBtn = document.createElement('div'),
 signUpBtn = document.createElement('div')
-
 
 const main = document.querySelector('#main')
 const body = document.querySelector('body')
@@ -13,7 +22,7 @@ signInBtn.classList.add('signInBtn')
 signUpBtn.classList.add('signUpBtn')
 signInBtn.innerText = 'Sign In'
 signUpBtn.innerText = 'Sign Up'
-rightItems.append(accountStuff)
+rightItems.prepend(accountStuff)
 accountStuff.append(signUpBtn)
 accountStuff.append(signInBtn)
 
@@ -27,7 +36,10 @@ const signUpForm =()=>{
         signUpEmail = document.createElement('input'),
         signUpSubmitBtn = document.createElement('button'),
         exitSignUpFormCon = document.createElement('div'),
-        exitSignUpForm = document.createElement('div')
+        exitSignUpForm = document.createElement('div'),
+        signUpAddress = document.createElement('input'),
+        signUpZip = document.createElement('input'),
+        signUpCity = document.createElement('input')
 
         signUpEmail.classList.add('signUpEmail')
         signUpCover.classList.add('signUpCover')
@@ -38,6 +50,9 @@ const signUpForm =()=>{
         signUpSubmitBtn.classList.add('signUpSubmitBtn')
         exitSignUpFormCon.classList.add('exitSignUpFormCon')
         exitSignUpForm.classList.add('exitSignUpForm')
+        signUpAddress.classList.add('signUpAddress')
+        signUpZip.classList.add('signUpZip')
+        signUpCity.classList.add('signUpCity')
         
         
         body.append(signUpCover)
@@ -45,20 +60,32 @@ const signUpForm =()=>{
         signUpFormCon.append(signUpForm)
         signUpForm.append(exitSignUpFormCon)
         exitSignUpFormCon.append(exitSignUpForm)
-        signUpForm.append(signUpEmail)
         signUpForm.append(signUpUsername)
         signUpForm.append(signUpPassword)
+        signUpForm.append(signUpEmail)
+        signUpForm.append(signUpAddress)
+        signUpForm.append(signUpZip)
+        signUpForm.append(signUpCity)
         signUpForm.append(signUpSubmitBtn)  
 
         exitSignUpForm.innerText ='❌'
-        signUpUsername.placeholder = 'Username'
+        signUpUsername.placeholder = 'Full name'
         signUpPassword.placeholder = 'Password'
         signUpEmail.placeholder = 'Email'
+        signUpAddress.placeholder = 'Address'
+        signUpZip.placeholder ='Zipcode'
         signUpEmail.type ='Email'
         signUpPassword.type = 'Password'
+        signUpAddress.type = 'Address'
+        signUpZip.type ='text'
+        signUpCity.placeholder = 'City'
         signUpEmail.setAttribute('required','')
         signUpUsername.setAttribute('required','')
         signUpPassword.setAttribute('required','')
+        signUpAddress.setAttribute('required','')
+        signUpCity.setAttribute('required','')
+        signUpZip.setAttribute('required','')
+        signUpZip.setAttribute('maxLength','5')
         signUpSubmitBtn.innerHTML = 'Sign Up'
         main.style.filter='blur(8px)'
         body.style.overflowY='hidden'
@@ -70,6 +97,31 @@ const signUpForm =()=>{
         body.style.overflowY=''
         navbar.style.filter=''
         })
+
+        signUpSubmitBtn.addEventListener('click', () => {
+            let userObj = {
+                username: signUpUsername.value,
+                password: signUpPassword.value,
+                email: signUpEmail.value,
+                address: signUpAddress.value,
+                city: signUpCity.value,
+                zip: signUpZip.value
+
+            }
+            fetch("http://localhost:3000/register", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                }, 
+                body: JSON.stringify(userObj)
+                
+              })
+                .then(res => res.json())
+                .then((data) => console.log(data))
+                /* .then((data) => setWeek(data)); */
+        
+        })
+
 }
 
 const signInForm = ()=>{
@@ -121,6 +173,24 @@ const signInForm = ()=>{
         body.style.overflowY=''
         navbar.style.filter=''
         })
+
+        signInSubmitBtn.addEventListener('click', () => {
+            let userObj = {
+                username: signInUsername.value,
+                password: signInPassword.value
+            }
+            fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                }, 
+                body: JSON.stringify(userObj)
+                
+              })
+                .then(res => res.json())
+                .then((data) => console.log(data))    
+        })
+        
 }   
 signInBtn.addEventListener('click',signInForm)
 

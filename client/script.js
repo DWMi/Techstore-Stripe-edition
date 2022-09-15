@@ -18,7 +18,6 @@ fetch("http://localhost:3000/products")
     })
     .then(function (data) {
         itemsData = data;
-        console.log(itemsData)
         getProductPrices()
     });
 
@@ -31,7 +30,6 @@ function getProductPrices() {
         .then(function (data) {
             let prices = data;
             priceArr = prices.data
-            console.log(priceArr)
             createUIFromLoadedItemsData();
         });
 
@@ -51,7 +49,6 @@ function createUIFromLoadedItemsData() {
 
     itemsData.data.forEach(product => {
         let priceObj = priceArr.find(price => price.id == product.default_price)
-        console.log(priceObj)
         list.appendChild(createListItem(product, priceObj))
     });
 
