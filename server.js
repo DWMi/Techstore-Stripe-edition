@@ -23,7 +23,7 @@ app.use("/", express.static("./client"));
 app.use(
   cookieSession({
     secret: "aVeryS3cr3tK3y",
-    maxAge: 1000 * 10,
+    maxAge: 1000 * 100,
     sameSite: "strict",
     httpOnly: true,
     secure: false,
@@ -55,11 +55,10 @@ app.get("/checkLogin", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  if (req.body.username && req.body.password) {
-    const foundUser = userArr.find((user) => user.username == req.body.username);
-    console.log(foundUser);
+  if (req.body.email && req.body.password) {
+    const foundUser = userArr.find((user) => user.email == req.body.email);
     if(!foundUser) {
-      res.status(401).json("Incorrect username or password..");
+      res.status(401).json("Incorrect email or password..");
       return;
     }
     const auth = await bcrypt.compare(req.body.password, foundUser.password)
@@ -69,6 +68,7 @@ app.post("/login", async (req, res) => {
         user: foundUser,
         date: new Date(),
       };
+      console.log(req.session);
       res.status(200).json("Successful signed in!");
       return;
     }
@@ -80,7 +80,7 @@ app.post("/login", async (req, res) => {
 
 app.delete("/logout", (req, res) => {
   if (req.session) {
-    console.log(req.session.signedInUser);
+  
     req.session = null;
     res.json('logged out')
   }

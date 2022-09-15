@@ -11,7 +11,8 @@ fetch("http://localhost:3000/checkLogin")
 const rightItems = document.querySelector('.rightItems'),
 accountStuff = document.createElement('div'),
 signInBtn = document.createElement('div'),
-signUpBtn = document.createElement('div')
+signUpBtn = document.createElement('div'),
+signOutBtn = document.createElement('div')
 
 const main = document.querySelector('#main')
 const body = document.querySelector('body')
@@ -20,17 +21,19 @@ const navbar = document.querySelector('.navbar')
 accountStuff.classList.add('accountStuff')
 signInBtn.classList.add('signInBtn')
 signUpBtn.classList.add('signUpBtn')
+signOutBtn.classList.add('signOutBtn')
 signInBtn.innerText = 'Sign In'
 signUpBtn.innerText = 'Sign Up'
+signOutBtn.innerText = 'Logout'
 rightItems.prepend(accountStuff)
 accountStuff.append(signUpBtn)
-accountStuff.append(signInBtn)
+accountStuff.append(signInBtn, signOutBtn)
 
 const signUpForm =()=>{
 
     const signUpFormCon = document.createElement('div'),
         signUpCover = document.createElement('div'),
-        signUpForm = document.createElement('div'),
+        signUpForm = document.createElement('form'),
         signUpUsername = document.createElement('input'),
         signUpPassword = document.createElement('input'),
         signUpEmail = document.createElement('input'),
@@ -40,6 +43,7 @@ const signUpForm =()=>{
         signUpAddress = document.createElement('input'),
         signUpZip = document.createElement('input'),
         signUpCity = document.createElement('input')
+        
 
         signUpEmail.classList.add('signUpEmail')
         signUpCover.classList.add('signUpCover')
@@ -74,7 +78,7 @@ const signUpForm =()=>{
         signUpEmail.placeholder = 'Email'
         signUpAddress.placeholder = 'Address'
         signUpZip.placeholder ='Zipcode'
-        signUpEmail.type ='Email'
+        signUpEmail.type ='email'
         signUpPassword.type = 'Password'
         signUpAddress.type = 'Address'
         signUpZip.type ='text'
@@ -86,7 +90,9 @@ const signUpForm =()=>{
         signUpCity.setAttribute('required','')
         signUpZip.setAttribute('required','')
         signUpZip.setAttribute('maxLength','5')
+        signUpZip.setAttribute('minLength','5')
         signUpSubmitBtn.innerHTML = 'Sign Up'
+        signUpSubmitBtn.type = 'submit'
         main.style.filter='blur(8px)'
         body.style.overflowY='hidden'
         navbar.style.filter='blur(8px)'
@@ -98,7 +104,8 @@ const signUpForm =()=>{
         navbar.style.filter=''
         })
 
-        signUpSubmitBtn.addEventListener('click', () => {
+       signUpForm.addEventListener('submit', (event) => {
+    
             let userObj = {
                 username: signUpUsername.value,
                 password: signUpPassword.value,
@@ -128,7 +135,7 @@ const signInForm = ()=>{
 
     const signInFormCon = document.createElement('div'),
         signInCover = document.createElement('div'),
-        signInForm = document.createElement('div'),
+        signInForm = document.createElement('form'),
         signInUsername = document.createElement('input'),
         signInPassword = document.createElement('input'),
         signInSubmitBtn = document.createElement('button'),
@@ -157,9 +164,10 @@ const signInForm = ()=>{
 
 
         exitSignInForm.innerText ='❌'
-        signInUsername.placeholder = 'Username'
+        signInUsername.placeholder = 'Email'
         signInPassword.placeholder = 'Password'
         signInPassword.type = 'Password'
+        signInUsername.type = 'email'
         signInUsername.setAttribute('required','')
         signInPassword.setAttribute('required','')
         signInSubmitBtn.innerHTML = 'Sign In'
@@ -174,9 +182,10 @@ const signInForm = ()=>{
         navbar.style.filter=''
         })
 
-        signInSubmitBtn.addEventListener('click', () => {
+        signInForm.addEventListener('submit', (e) => {
+            e.preventDefault()
             let userObj = {
-                username: signInUsername.value,
+                email: signInUsername.value,
                 password: signInPassword.value
             }
             fetch("http://localhost:3000/login", {
@@ -188,10 +197,23 @@ const signInForm = ()=>{
                 
               })
                 .then(res => res.json())
-                .then((data) => console.log(data))    
+                .then((data) => console.log(data))
+                .then(setTimeout(() => {
+                    location.reload()
+                }, 1000))
+                
+
         })
-        
 }   
 signInBtn.addEventListener('click',signInForm)
 
 signUpBtn.addEventListener('click', signUpForm)
+
+signOutBtn.addEventListener('click', () => {
+    fetch("http://localhost:3000/logout", {
+        method: "DELETE",  
+      })
+        .then(res => res.json())
+        .then((data) => console.log(data))
+        
+})
