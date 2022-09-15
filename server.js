@@ -46,7 +46,7 @@ app.get("/users", (req, res) => {
   res.json(users);
 });
 
-app.get("/login", (req, res) => {
+app.get("/checkLogin", (req, res) => {
   if (req.session && req.session.signedInUser) {
     res.json(req.session.signedInUser);
     return;
@@ -56,8 +56,14 @@ app.get("/login", (req, res) => {
 
 app.post("/login", async (req, res) => {
   if (req.body.username && req.body.password) {
-    const foundUser = users.find((user) => user.username == req.body.username);
-    if (foundUser && bcrypt.compare(req.body.password, foundUser.password)) {
+    const foundUser = userArr.find((user) => user.username == req.body.username);
+    console.log(foundUser);
+    if(!foundUser) {
+      res.status(401).json("Incorrect username or password..");
+      return;
+    }
+    const auth = await bcrypt.compare(req.body.password, foundUser.password)
+    if (foundUser && auth) {
       req.session.signedInUser = {
         id: nanoid(),
         user: foundUser,
@@ -66,22 +72,28 @@ app.post("/login", async (req, res) => {
       res.status(200).json("Successful signed in!");
       return;
     }
-    res.status(401).json("Incorrect password!!!");
-    return;
   }
 
-  res.status(401).json("Incorrect Username!!!");
+  res.status(401).json("Incorrect password");
+  return
 });
 
-app.delete("/login", (req, res) => {
-  if (req.session.signedInUser) {
+app.delete("/logout", (req, res) => {
+  if (req.session) {
+    console.log(req.session.signedInUser);
     req.session = null;
-    res.json("Signed Out");
+    res.json('logged out')
   }
 });
 
 app.post("/register", async (req, res) => {
-  if (req.body && req.body.username && req.body.password && req.body.email) {
+  let userExist = userArr.find(user => user.email == req.body.email)
+  if(userExist) {
+    res.json("This user already exists! Choose another username..");
+    return;
+  }
+
+  if (req.body && req.body.username && req.body.password && req.body.email && req.body.address && req.body.city && req.body.zip) {
     const hashedPW = await bcrypt.hash(req.body.password, 10);
 
     let user = {
@@ -89,6 +101,9 @@ app.post("/register", async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPW,
+      address: req.body.address,
+      city: req.body.city,
+      zip: req.body.zip
     };
 
     console.log(userData);
@@ -96,12 +111,18 @@ app.post("/register", async (req, res) => {
     users = JSON.stringify(userArr);
     fs.writeFile("users.json", users, (err) => {
       if (err) throw err;
-      console.log("New user is added");
+      res.json("New user is added");
     });
 
     const customer = await stripe.customers.create({
       name: user.username,
       email: user.email,
+      address: {
+        line1: user.address,
+        city: user.city,
+        postal_code: user.zip
+      }
+
     });
 
     res.json("New user has ben signed up");
@@ -111,20 +132,71 @@ app.post("/register", async (req, res) => {
   res.json("Incorrect info");
 });
 
+app.get('/test', (req, res) => {
+  res.json(userArr)
+})
+
 app.post("/checkout", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
+      shipping_address_collection: {
+        allowed_countries: ['SE', 'US'],
+      },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 0,
+              currency: 'sek',
+            },
+            display_name: 'Free shipping',
+            // Delivers between 5-7 business days
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 5,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 7,
+              },
+            }
+          }
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 1500,
+              currency: 'sek',
+            },
+            display_name: 'Next day air',
+            // Delivers in exactly 1 business day
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 1,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 1,
+              },
+            }
+          }
+        },
+      ],
       line_items: req.body.shoppingCart.map((data) => {
-        const storeItem = res.get(data.name);
+        
         return {
           price_data: {
             currency: "sek",
             unit_amount: data.price,
             product_data: {
               name: data.name,
-              images: data.images, //does not show image?
+              images: data.images,
             },
           },
           quantity: data.qty,
