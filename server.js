@@ -23,7 +23,7 @@ app.use("/", express.static("./client"));
 app.use(
   cookieSession({
     secret: "aVeryS3cr3tK3y",
-    maxAge: 1000 * 100,
+    maxAge: 1000 * 100000,
     sameSite: "strict",
     httpOnly: true,
     secure: false,
@@ -48,10 +48,16 @@ app.get("/users", (req, res) => {
 
 app.get("/checkLogin", (req, res) => {
   if (req.session && req.session.signedInUser) {
-    res.json(req.session.signedInUser);
+    const user = {
+      id: req.session.signedInUser.user.id,
+      email: req.session.signedInUser.user.email,
+      name: req.session.signedInUser.user.username,
+      loggedIn: true
+    }
+    res.json(user);
     return;
   }
-  res.json("Not longer signed in");
+  res.json({loggedIn: false});
 });
 
 app.post("/login", async (req, res) => {
@@ -100,16 +106,12 @@ app.post("/register", async (req, res) => {
       id: nanoid(),
       username: req.body.username,
       email: req.body.email,
-      password: hashedPW,
-      address: req.body.address,
-      city: req.body.city,
-      zip: req.body.zip
+      password: hashedPW
     };
 
-    console.log(userData);
     userArr.push(user);
     users = JSON.stringify(userArr);
-    fs.writeFile("users.json", users, (err) => {
+    fs.writeFile("users.json", users, (err) => {  
       if (err) throw err;
       res.json("New user is added");
     });
@@ -118,14 +120,15 @@ app.post("/register", async (req, res) => {
       name: user.username,
       email: user.email,
       address: {
-        line1: user.address,
-        city: user.city,
-        postal_code: user.zip
+        line1: req.body.address,
+        city: req.body.city,
+        postal_code: req.body.zip
       }
 
+      
     });
-
-    res.json("New user has ben signed up");
+    
+    res.json(customer + "New user has ben signed up");
     return;
   }
 
