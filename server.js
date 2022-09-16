@@ -102,8 +102,19 @@ app.post("/register", async (req, res) => {
   if (req.body && req.body.username && req.body.password && req.body.email && req.body.address && req.body.city && req.body.zip) {
     const hashedPW = await bcrypt.hash(req.body.password, 10);
 
+    const customer = await stripe.customers.create({
+      name: req.body.username,
+      email: req.body.email,
+      address: {
+        line1: req.body.address,
+        city: req.body.city,
+        postal_code: req.body.zip
+      }
+
+    });
+
     let user = {
-      id: nanoid(),
+      id: customer.id,
       username: req.body.username,
       email: req.body.email,
       password: hashedPW
@@ -116,19 +127,9 @@ app.post("/register", async (req, res) => {
       res.json("New user is added");
     });
 
-    const customer = await stripe.customers.create({
-      name: user.username,
-      email: user.email,
-      address: {
-        line1: req.body.address,
-        city: req.body.city,
-        postal_code: req.body.zip
-      }
 
-      
-    });
     
-    res.json(customer + "New user has ben signed up");
+    res.json("New user has ben signed up");
     return;
   }
 
@@ -142,6 +143,7 @@ app.get('/test', (req, res) => {
 app.post("/checkout", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
+      customer: req.session.signedInUser.user.id,
       payment_method_types: ["card"],
       mode: "payment",
       shipping_address_collection: {
