@@ -145,7 +145,9 @@ const signUpForm =()=>{
               })
                 .then(res => res.json())
                 .then((data) => console.log(data))
-                /* .then((data) => setWeek(data)); */
+                .then(setTimeout(() => {
+                    location.reload()
+                }, 1000))
         
         })
 

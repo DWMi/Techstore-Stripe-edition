@@ -102,8 +102,19 @@ app.post("/register", async (req, res) => {
   if (req.body && req.body.username && req.body.password && req.body.email && req.body.address && req.body.city && req.body.zip) {
     const hashedPW = await bcrypt.hash(req.body.password, 10);
 
+    const customer = await stripe.customers.create({
+      name: req.body.username,
+      email: req.body.email,
+      address: {
+        line1: req.body.address,
+        city: req.body.city,
+        postal_code: req.body.zip
+      }
+
+    });
+
     let user = {
-      id: nanoid(),
+      id: customer.id,
       username: req.body.username,
       email: req.body.email,
       password: hashedPW
@@ -116,19 +127,14 @@ app.post("/register", async (req, res) => {
       res.json("New user is added");
     });
 
-    const customer = await stripe.customers.create({
-      name: user.username,
-      email: user.email,
-      address: {
-        line1: req.body.address,
-        city: req.body.city,
-        postal_code: req.body.zip
-      }
+    req.session.signedInUser = {
+      id: nanoid(),
+      user: user,
+      date: new Date(),
+    };
 
-      
-    });
     
-    res.json(customer + "New user has ben signed up");
+    res.json("New user has ben signed up");
     return;
   }
 
@@ -142,6 +148,7 @@ app.get('/test', (req, res) => {
 app.post("/checkout", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
+      customer: req.session.signedInUser.user.id,
       payment_method_types: ["card"],
       mode: "payment",
       shipping_address_collection: {
@@ -206,13 +213,13 @@ app.post("/checkout", async (req, res) => {
         };
       }),
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}",`, //add order
+      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`, //add order
       cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
     });
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
-  }
+  } 
 });
 
 app.get("/success", async (req, res) => {
@@ -222,6 +229,18 @@ app.get("/success", async (req, res) => {
   res.send(
     `<html><body><h1>Thanks for your order, ${customer.name}!</h1></body></html>`
   );
+});
+
+app.get("/checkout-session", async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.id, {
+    expand: ['line_items']
+  });
+
+  if(session.payment_status == 'paid'){
+    res.json(session)
+  } else {
+    res.json('this was not paid!')
+  }
 });
 
 app.listen(port, () => {

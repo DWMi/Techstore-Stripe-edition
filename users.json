@@ -1,1 +1,26 @@
-[{"id":"Wx4Ii4WRvc0Z1kJhd3RwH","username":"julius","email":"julle@gmail.com","password":"$2b$10$8cjX/sUGq/0MYqkKtYsleObS.vMCkzFwme1OAzy2trjtfGW0xA7ca"}]
+[
+    {
+        "id": "cus_MRT99lFhyICnD3",
+        "username": "Julio Iglesias",
+        "email": "julio@test.se",
+        "password": "$2b$10$l5ZZ48O9hTIw.DAAn4jYrunEW/0Z9KjhBG0dyVe8vJ7bGNB86hTDe"
+    },
+    {
+        "id": "cus_MRTRFQusNoT516",
+        "username": "David Toni",
+        "email": "toni@david.se",
+        "password": "$2b$10$1AIvfW2JBN/9Y.y6EEvTMulGr.P3UbNEkZ33/3NvNZ1u6XwcRPoj2"
+    },
+    {
+        "id": "cus_MRTTNLFOES0Tjo",
+        "username": "hejhej",
+        "email": "toni@de.se",
+        "password": "$2b$10$NH/qxiEuyMnQqfFINJUikuJHLRcrJkjYaGrTRCXBz8jQO0..wtwGq"
+    },
+    {
+        "id": "cus_MRTUxsgWhCMTVO",
+        "username": "hejhej",
+        "email": "tja@hej.se",
+        "password": "$2b$10$fjv.rhA1uSudSjgvbdOUTOm6WkfEoirbrq15EBIjpbnsCpP/jkR4W"
+    }
+]
