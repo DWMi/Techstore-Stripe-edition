@@ -268,8 +268,6 @@ function createShoppingSummary() {
     })
 
   
-
-
     var info = document.createElement("div");
     info.appendChild(priceLabel);
     info.appendChild(proceedButton);
