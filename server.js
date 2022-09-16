@@ -127,6 +127,11 @@ app.post("/register", async (req, res) => {
       res.json("New user is added");
     });
 
+    req.session.signedInUser = {
+      id: nanoid(),
+      user: user,
+      date: new Date(),
+    };
 
     
     res.json("New user has ben signed up");
@@ -208,13 +213,13 @@ app.post("/checkout", async (req, res) => {
         };
       }),
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}",`, //add order
+      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`, //add order
       cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
     });
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
-  }
+  } 
 });
 
 app.get("/success", async (req, res) => {
@@ -224,6 +229,18 @@ app.get("/success", async (req, res) => {
   res.send(
     `<html><body><h1>Thanks for your order, ${customer.name}!</h1></body></html>`
   );
+});
+
+app.get("/checkout-session", async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.id, {
+    expand: ['line_items']
+  });
+
+  if(session.payment_status == 'paid'){
+    res.json(session)
+  } else {
+    res.json('this was not paid!')
+  }
 });
 
 app.listen(port, () => {

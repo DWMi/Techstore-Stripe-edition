@@ -5,7 +5,8 @@ let shoppingCart;
 if(localStorage.getItem('products')) {
      shoppingCart = JSON.parse(localStorage.getItem('products'))
 }else{
-     shoppingCart = [];
+    shoppingCart = [];
+    JSON.stringify(localStorage.setItem('products', '[]'))
 }
 var isItemsViewVisible = false;
 
@@ -139,9 +140,11 @@ function showShoppingCart() {
     var list = document.createElement("ul");
 
     shoppingCart = JSON.parse(localStorage.getItem('products'))
-    shoppingCart.forEach(product => {
-        list.appendChild(createShoppingCartItem(product));
-    });
+    if(shoppingCart){
+        shoppingCart.forEach(product => {
+            list.appendChild(createShoppingCartItem(product));
+        });
+    }
  
     /* Shopping info & action */
     var info = createShoppingSummary();
@@ -260,6 +263,7 @@ function createShoppingSummary() {
         })
         .then(({ url }) => {
             window.location = url
+            console.log(url)
             
         })
         .catch(e => {
