@@ -1,12 +1,25 @@
 /* import fetch from "node-fetch" */
 
-fetch("http://localhost:3000/checkLogin")
+let testRes = await checkLogIn()
+
+
+async function checkLogIn() {
+    let url = "http://localhost:3000/checkLogin"
+    let method = "GET"
+    let result = await makeRequest(url, method, undefined)
+    /* fetch("http://localhost:3000/checkLogin")
     .then(function (response) {
         return response.json();
     })
     .then(function (data) {
-        console.log(data)
-    });
+    test = data
+    }); */
+    return result;
+
+}
+
+
+console.log(testRes)
 
 const rightItems = document.querySelector('.rightItems'),
 accountStuff = document.createElement('div'),
@@ -28,6 +41,13 @@ signOutBtn.innerText = 'Logout'
 rightItems.prepend(accountStuff)
 accountStuff.append(signUpBtn)
 accountStuff.append(signInBtn, signOutBtn)
+
+if(testRes.loggedIn) {
+    accountStuff.removeChild(signInBtn)
+    accountStuff.removeChild(signUpBtn)
+} else {
+    accountStuff.removeChild(signOutBtn)
+}
 
 const signUpForm =()=>{
 
@@ -105,7 +125,7 @@ const signUpForm =()=>{
         })
 
        signUpForm.addEventListener('submit', (event) => {
-    
+            event.preventDefault()
             let userObj = {
                 username: signUpUsername.value,
                 password: signUpPassword.value,
@@ -215,5 +235,23 @@ signOutBtn.addEventListener('click', () => {
       })
         .then(res => res.json())
         .then((data) => console.log(data))
-        
+        localStorage.clear()
+        location.reload()
 })
+
+async function makeRequest(url, method, body) {
+    try {
+        let response = await fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body
+        })
+        let result = await response.json()
+        return result;
+
+    } catch (err) {
+        console.error(err);
+    }
+}
