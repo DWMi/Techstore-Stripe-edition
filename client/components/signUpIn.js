@@ -223,6 +223,10 @@ const signInForm = ()=>{
                 .then(setTimeout(() => {
                     location.reload()
                 }, 1000))
+                .catch((err) => {
+                    err.status
+                    err.message
+                })
                 
 
         })
