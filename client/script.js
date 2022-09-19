@@ -1,16 +1,18 @@
+import { addToCart, removeFromCart } from "./localStorageFunctions.js";
+document.getElementById('shoppingCart').addEventListener('click', showShoppingCart)
+document.getElementById('titleHeader').addEventListener('click', createUIFromLoadedItemsData)
+let counter = document.querySelector("#counter");
 
-var itemsData;
-let priceArr;
+let itemsData;
 let shoppingCart;
-if(localStorage.getItem('products')) {
-     shoppingCart = JSON.parse(localStorage.getItem('products'))
-}else{
+let isItemsViewVisible = false;
+
+if (localStorage.getItem('products')) {
+    shoppingCart = JSON.parse(localStorage.getItem('products'))
+} else {
     shoppingCart = [];
     JSON.stringify(localStorage.setItem('products', '[]'))
 }
-var isItemsViewVisible = false;
-
-
 
 /* Fetch data from the json file into a javascript object */
 fetch("http://localhost:3000/products")
@@ -19,25 +21,12 @@ fetch("http://localhost:3000/products")
     })
     .then(function (data) {
         itemsData = data;
-        getProductPrices()
+        console.log(itemsData)
+        createUIFromLoadedItemsData();
+        let totalQty = localStorage.getItem('quantity')
+        counter.innerText = totalQty
     });
 
-// FETCH PRICES
-function getProductPrices() {
-    fetch("http://localhost:3000/prices")
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            let prices = data;
-            priceArr = prices.data
-            createUIFromLoadedItemsData();
-        });
-
-        let totalQty = localStorage.getItem('quantity')
-        counter = document.querySelector("#counter");
-        counter.innerText = totalQty 
-}
 
 /* Use the data to create a list of these object on your website */
 function createUIFromLoadedItemsData() {
@@ -47,10 +36,8 @@ function createUIFromLoadedItemsData() {
     /* Create a list of the products */
     var list = document.createElement("ul");
 
-
     itemsData.data.forEach(product => {
-        let priceObj = priceArr.find(price => price.id == product.default_price)
-        list.appendChild(createListItem(product, priceObj))
+        list.appendChild(createListItem(product))
     });
 
 
@@ -63,7 +50,7 @@ function createUIFromLoadedItemsData() {
     }
 }
 
-function createListItem(product, priceObj) {
+function createListItem(product) {
 
     /* Title */
     var title = document.createElement("h3");
@@ -78,12 +65,8 @@ function createListItem(product, priceObj) {
     image.src = product.images[0]
 
     /* Price */
-
-    let priceString = priceObj.unit_amount.toString()
-    if (priceObj) {
-        var price = document.createElement("span");
-        price.innerText = `${priceString.substring(0, priceString.length - 2)} kr`
-    }
+    var price = document.createElement("span");
+    price.innerText = `${product.default_price.unit_amount / 100} kr`
 
     /* Button */
     var button = document.createElement("button");
@@ -95,26 +78,7 @@ function createListItem(product, priceObj) {
         totalQty = parseInt(totalQty)
         let exist = shoppingCart.find(item => item.id == product.id)
 
-        //Add to localStorage cart
-        if (exist) {
-            exist.qty += 1
-            localStorage.setItem('products', JSON.stringify(shoppingCart))
-        } else {
-            shoppingCart.push({ ...product, qty: 1, price: priceObj.unit_amount});
-            localStorage.setItem('products', JSON.stringify(shoppingCart))
-        }
-
-        //add to totalQty in cart
-        if (totalQty) {
-            counter = document.querySelector("#counter");
-            localStorage.setItem('quantity', totalQty + 1)
-            counter.innerText = totalQty + 1
-        } else {
-            localStorage.setItem('quantity', 1)
-            counter = document.querySelector("#counter");
-            counter.innerText = 1
-        }
-
+        addToCart(product, exist, shoppingCart, totalQty, counter)
     };
 
     var item = document.createElement("li");
@@ -140,12 +104,12 @@ function showShoppingCart() {
     var list = document.createElement("ul");
 
     shoppingCart = JSON.parse(localStorage.getItem('products'))
-    if(shoppingCart){
+    if (shoppingCart) {
         shoppingCart.forEach(product => {
             list.appendChild(createShoppingCartItem(product));
         });
     }
- 
+
     /* Shopping info & action */
     var info = createShoppingSummary();
 
@@ -169,7 +133,7 @@ function createShoppingCartItem(product) {
 
     /* Price */
     var price = document.createElement("span");
-    price.innerText = product.price/100 * product.qty + " " + "kr"
+    price.innerText = product.price / 100 * product.qty + " " + "kr"
 
     /* Qty */
     let qty = document.createElement('span')
@@ -183,36 +147,12 @@ function createShoppingCartItem(product) {
         shoppingCart = JSON.parse(localStorage.getItem('products'))
         let totalQty = localStorage.getItem('quantity')
         totalQty = parseInt(totalQty)
-
         let exist = shoppingCart.find(item => item.id == product.id)
-        if (exist.qty > 1) {
-            exist.qty -= 1
-            localStorage.setItem('products', JSON.stringify(shoppingCart))
-            
-        } else {
-            let indexToRemove = shoppingCart.findIndex(item => item.id == product.id)
-            shoppingCart.splice(indexToRemove, 1)
-            localStorage.setItem('products', JSON.stringify(shoppingCart))
-        }
 
-         if (totalQty) {
-            counter = document.querySelector("#counter");
-            localStorage.setItem('quantity', totalQty - 1)
-            counter.innerText = totalQty - 1
-        } else {
-            localStorage.setItem('quantity', )
-            counter = document.querySelector("#counter");
-            counter.innerText = totalQty
-        }
-        
-        
+        removeFromCart(product, exist, shoppingCart, totalQty, counter)
+
         isItemsViewVisible = true;
         showShoppingCart();
-
-        /* Update the counter */
-        /* counter = document.querySelector("#counter");
-        counter.innerText = totalQty */
-        /* Update the UI list */
     };
 
     var item = document.createElement("li");
@@ -231,7 +171,7 @@ function createShoppingSummary() {
 
     var totalPrice = 0;
     for (var i = 0; i < shoppingCart.length; i++) {
-        totalPrice += shoppingCart[i].price * shoppingCart[i].qty /100;
+        totalPrice += shoppingCart[i].price * shoppingCart[i].qty / 100;
     }
     var priceLabel = document.createElement("h2");
     priceLabel.innerText = "Totalt pris: " + totalPrice + " kr";
@@ -241,37 +181,37 @@ function createShoppingSummary() {
     proceedButton.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Slutför ditt köp";
     proceedButton.onclick = function () {
         console.log(shoppingCart);
-        
+
     };
 
     proceedButton.addEventListener("click", () => {
         console.log(shoppingCart);
-        
+
         fetch("http://localhost:3000/checkout", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            shoppingCart,
-        }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                shoppingCart,
+            }),
         })
-        .then(async res => {
-            if (res.ok) return res.json()
-            const json = await res.json();
-            return await Promise.reject(json);
-        })
-        .then(({ url }) => {
-            window.location = url
-            console.log(url)
-            
-        })
-        .catch(e => {
-            console.error(e.error)
-        })
+            .then(async res => {
+                if (res.ok) return res.json()
+                const json = await res.json();
+                return await Promise.reject(json);
+            })
+            .then(({ url }) => {
+                window.location = url
+                console.log(url)
+
+            })
+            .catch(e => {
+                console.error(e.error)
+            })
     })
 
-  
+
     var info = document.createElement("div");
     info.appendChild(priceLabel);
     info.appendChild(proceedButton);
@@ -279,9 +219,9 @@ function createShoppingSummary() {
     return info;
 }
 setTimeout(() => {
-              
-    if(window.location.href === "http://localhost:3000/cancel.html"){
-      window.location.href = "http://localhost:3000/"
-      console.log('url')
-      }
-},1500);
+
+    if (window.location.href === "http://localhost:3000/cancel.html") {
+        window.location.href = "http://localhost:3000/"
+        console.log('url')
+    }
+}, 1500);
