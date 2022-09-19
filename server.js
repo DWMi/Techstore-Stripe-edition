@@ -6,15 +6,15 @@ import Stripe from "stripe";
 import { nanoid } from "nanoid";
 import cookieSession from "cookie-session";
 import bcrypt from "bcrypt";
-import * as fs from "fs"
+import * as fs from "fs";
 
-let users = []
-let userData = fs.readFileSync('users.json')
-let userArr = JSON.parse(userData)
+let users = [];
+let userData = fs.readFileSync("users.json");
+let userArr = JSON.parse(userData);
 
-let orders = []
-let orderData = fs.readFileSync('orders.json')
-let orderArr = JSON.parse(orderData)
+let orders = [];
+let orderData = fs.readFileSync("orders.json");
+let orderArr = JSON.parse(orderData);
 
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY);
 
@@ -51,22 +51,22 @@ app.get("/checkLogin", (req, res) => {
       id: req.session.signedInUser.user.id,
       email: req.session.signedInUser.user.email,
       name: req.session.signedInUser.user.username,
-      loggedIn: true
-    }
+      loggedIn: true,
+    };
     res.json(user);
     return;
   }
-  res.json({loggedIn: false});
+  res.json({ loggedIn: false });
 });
 
 app.post("/login", async (req, res) => {
   if (req.body.email && req.body.password) {
     const foundUser = userArr.find((user) => user.email == req.body.email);
-    if(!foundUser) {
+    if (!foundUser) {
       res.status(401).json("Incorrect email or password..");
       return;
     }
-    const auth = await bcrypt.compare(req.body.password, foundUser.password)
+    const auth = await bcrypt.compare(req.body.password, foundUser.password);
     if (foundUser && auth) {
       req.session.signedInUser = {
         id: nanoid(),
@@ -80,25 +80,32 @@ app.post("/login", async (req, res) => {
   }
 
   res.status(401).json("Incorrect password");
-  return
+  return;
 });
 
 app.delete("/logout", (req, res) => {
   if (req.session) {
-  
     req.session = null;
-    res.json('logged out')
+    res.json("logged out");
   }
 });
 
 app.post("/register", async (req, res) => {
-  let userExist = userArr.find(user => user.email == req.body.email)
-  if(userExist) {
+  let userExist = userArr.find((user) => user.email == req.body.email);
+  if (userExist) {
     res.json("This user already exists! Choose another username..");
     return;
   }
 
-  if (req.body && req.body.username && req.body.password && req.body.email && req.body.address && req.body.city && req.body.zip) {
+  if (
+    req.body &&
+    req.body.username &&
+    req.body.password &&
+    req.body.email &&
+    req.body.address &&
+    req.body.city &&
+    req.body.zip
+  ) {
     const hashedPW = await bcrypt.hash(req.body.password, 10);
 
     const customer = await stripe.customers.create({
@@ -107,21 +114,20 @@ app.post("/register", async (req, res) => {
       address: {
         line1: req.body.address,
         city: req.body.city,
-        postal_code: req.body.zip
-      }
-
+        postal_code: req.body.zip,
+      },
     });
 
     let user = {
       id: customer.id,
       username: req.body.username,
       email: req.body.email,
-      password: hashedPW
+      password: hashedPW,
     };
 
     userArr.push(user);
     users = JSON.stringify(userArr);
-    fs.writeFile("users.json", users, (err) => {  
+    fs.writeFile("users.json", users, (err) => {
       if (err) throw err;
       res.json("New user is added");
     });
@@ -132,14 +138,12 @@ app.post("/register", async (req, res) => {
       date: new Date(),
     };
 
-    
     res.json("New user has ben signed up");
     return;
   }
 
   res.json("Incorrect info");
 });
-
 
 app.post("/checkout", async (req, res) => {
   try {
@@ -148,54 +152,53 @@ app.post("/checkout", async (req, res) => {
       payment_method_types: ["card"],
       mode: "payment",
       shipping_address_collection: {
-        allowed_countries: ['SE', 'US'],
+        allowed_countries: ["SE", "US"],
       },
       shipping_options: [
         {
           shipping_rate_data: {
-            type: 'fixed_amount',
+            type: "fixed_amount",
             fixed_amount: {
               amount: 0,
-              currency: 'sek',
+              currency: "sek",
             },
-            display_name: 'Free shipping',
+            display_name: "Free shipping",
             // Delivers between 5-7 business days
             delivery_estimate: {
               minimum: {
-                unit: 'business_day',
+                unit: "business_day",
                 value: 5,
               },
               maximum: {
-                unit: 'business_day',
+                unit: "business_day",
                 value: 7,
               },
-            }
-          }
+            },
+          },
         },
         {
           shipping_rate_data: {
-            type: 'fixed_amount',
+            type: "fixed_amount",
             fixed_amount: {
               amount: 1500,
-              currency: 'sek',
+              currency: "sek",
             },
-            display_name: 'Next day air',
+            display_name: "Next day air",
             // Delivers in exactly 1 business day
             delivery_estimate: {
               minimum: {
-                unit: 'business_day',
+                unit: "business_day",
                 value: 1,
               },
               maximum: {
-                unit: 'business_day',
+                unit: "business_day",
                 value: 1,
               },
-            }
-          }
+            },
+          },
         },
       ],
       line_items: req.body.shoppingCart.map((data) => {
-        
         return {
           price_data: {
             currency: "sek",
@@ -215,47 +218,74 @@ app.post("/checkout", async (req, res) => {
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
-  } 
+  }
 });
 
-
 app.get("/checkout/session", async (req, res) => {
+  try {
   const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-    expand: ['line_items.data.price.product']
+    expand: ["line_items.data.price.product"],
   });
+
+  let paid = session.payment_status == "paid";
+
+  if (!paid) {
+    res.status(400)
+    throw new Error('Payment failed')
+    
+  }
+
 
   let orderTest = {
     orderId: session.payment_intent,
     customer_id: session.customer,
-    name: session.customer_details.name,
+    name: session.shipping_details.name,
     email: session.customer_details.email,
-    address:{
-      city: session.customer_details.address.city,
-      line1: session.customer_details.address.line1,
-      zip: session.customer_details.address.postal_code
+    address: {
+      city: session.shipping_details.address.city,
+      line1: session.shipping_details.address.line1,
+      zip: session.shipping_details.address.postal_code,
     },
     total_amount: session.amount_total,
-    products: session.line_items.data
-  }
+    products: session.line_items.data,
+  };
 
-  const foundOrder = orderArr.find(order => order.orderId == orderTest.orderId)
+  const foundOrder = orderArr.find(
+    (order) => order.orderId == session.payment_intent
+  );
 
-  if(session.payment_status == 'paid' && !foundOrder){
-    res.json(session)
+  
+
+  if (!foundOrder) {
     orderArr.push(orderTest);
     orders = JSON.stringify(orderArr);
-    fs.writeFile("orders.json", orders, (err) => {  
+    fs.writeFile("orders.json", orders, (err) => {
       if (err) throw err;
-      res.json("New order is added");
     });
-  } else{
-    res.json('This order was already paid!')
-  
+    return res.json('Order saved!');
+  } else {
+    res.json('Order already placed!');
   }
-  })
-  
+} catch (err){
 
+  res.json(err)
+}
+});
 
+app.get("/get-order", async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.id, {});
+
+  const foundOrder = orderArr.find(
+    (order) => order.orderId == session.payment_intent
+    );
+    
+    if (foundOrder) {
+      res.json(foundOrder);
+    } else {
+      res.status();
+    }
+    
+});
 
 app.listen(port, () => {
   console.log("Server is running on port " + port);
