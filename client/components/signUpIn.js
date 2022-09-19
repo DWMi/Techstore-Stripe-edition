@@ -1,4 +1,3 @@
-/* import fetch from "node-fetch" */
 
 let testRes = await checkLogIn()
 
@@ -25,28 +24,53 @@ const rightItems = document.querySelector('.rightItems'),
 accountStuff = document.createElement('div'),
 signInBtn = document.createElement('div'),
 signUpBtn = document.createElement('div'),
-signOutBtn = document.createElement('div')
+signOutBtn = document.createElement('div'),
+userBtn = document.createElement('div'),
+loginStuff = document.createElement('div'),
+myOrder = document.createElement('div'),
+userStuff = document.createElement('div'),
+userStuffCC = document.createElement('div'),
+userStuffClose = document.createElement('div')
 
-const main = document.querySelector('#main')
-const body = document.querySelector('body')
-const navbar = document.querySelector('.navbar')
+const main = document.querySelector('#main'),
+    body = document.querySelector('body'),
+    navbar = document.querySelector('.navbar')
 
+userStuffCC.classList.add('userStuffCC')
+userStuffClose.classList.add('userStuffClose')
+userStuff.classList.add('userStuff')
+userBtn.classList.add('userBtn')
+loginStuff.classList.add('loginStuff')
+myOrder.classList.add('myOrder')
 accountStuff.classList.add('accountStuff')
 signInBtn.classList.add('signInBtn')
 signUpBtn.classList.add('signUpBtn')
 signOutBtn.classList.add('signOutBtn')
+userBtn.innerHTML = '<i class="fa fa-user-circle" aria-hidden="true"></i>'  
 signInBtn.innerText = 'Sign In'
 signUpBtn.innerText = 'Sign Up'
 signOutBtn.innerText = 'Logout'
+userStuffClose.innerText = '❌'
+userStuffClose.style.textAlign = 'right'
+myOrder.innerText = 'My Orders 🛒'
+
 rightItems.prepend(accountStuff)
-accountStuff.append(signUpBtn)
-accountStuff.append(signInBtn, signOutBtn)
+accountStuff.append(userBtn)
+body.prepend(userStuff)
+userStuff.append(userStuffCC)
+userStuffCC.append(userStuffClose)
+userStuff.append(myOrder)
+userStuff.append(loginStuff)
+loginStuff.append(signUpBtn)
+loginStuff.append(signInBtn)
+loginStuff.append(signOutBtn)
 
 if(testRes.loggedIn) {
-    accountStuff.removeChild(signInBtn)
-    accountStuff.removeChild(signUpBtn)
+    loginStuff.removeChild(signInBtn)
+    loginStuff.removeChild(signUpBtn)
 } else {
-    accountStuff.removeChild(signOutBtn)
+    userStuff.removeChild(myOrder)
+    loginStuff.removeChild(signOutBtn)
 }
 
 const signUpForm =()=>{
@@ -64,7 +88,8 @@ const signUpForm =()=>{
         signUpZip = document.createElement('input'),
         signUpCity = document.createElement('input')
         
-
+        
+     
         signUpEmail.classList.add('signUpEmail')
         signUpCover.classList.add('signUpCover')
         signUpFormCon.classList.add('signUpFormCon')
@@ -241,6 +266,16 @@ signOutBtn.addEventListener('click', () => {
         location.reload()
 })
 
+userBtn.addEventListener('click', ()=>{
+    userStuff.style.display='flex'
+    
+})
+userStuffCC.addEventListener('click',()=>{
+    userStuff.style.display='none'
+})
+myOrder.addEventListener('click',()=>{
+    showShoppingCart()
+})
 async function makeRequest(url, method, body) {
     try {
         let response = await fetch(url, {
