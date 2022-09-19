@@ -40,11 +40,6 @@ app.get("/products", async (req, res) => {
   res.json(products);
 });
 
-app.get("/prices", async (req, res) => {
-  const prices = await stripe.prices.list({});
-
-  res.json(prices);
-});
 
 app.get("/users", (req, res) => {
   res.json(users);

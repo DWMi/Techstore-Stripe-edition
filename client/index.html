@@ -6,12 +6,14 @@
     
     <script src="https://use.fontawesome.com/86ad615387.js"></script>
     <link rel="stylesheet" href="./style.css">
+    <script defer type="module" src="./script.js"></script>
+    <script defer type="module" src="./components/signUpIn.js"></script>
   </head>
   <body>
     <header class="navbar">
-      <h1 onclick="createUIFromLoadedItemsData()">TechStore</h1>
+      <h1 id="titleHeader">TechStore</h1>
       <div class="rightItems">
-        <a onclick="showShoppingCart()">
+        <a id="shoppingCart">
           <span id="counter"></span> <i class="fa fa-shopping-cart" aria-hidden="true"></i>
         </a>
       </div>
@@ -21,8 +23,7 @@
       <!-- add items here! -->
     </div>
 
-    <script src="./script.js"></script>
-    <script type="module" src="./components/signUpIn.js"></script>
+  
   </body>
 </html>
 
