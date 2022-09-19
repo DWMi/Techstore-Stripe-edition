@@ -12,6 +12,10 @@ let users = []
 let userData = fs.readFileSync('users.json')
 let userArr = JSON.parse(userData)
 
+let orders = []
+let orderData = fs.readFileSync('orders.json')
+let orderArr = JSON.parse(orderData)
+
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 const port = 3000;
@@ -141,9 +145,6 @@ app.post("/register", async (req, res) => {
   res.json("Incorrect info");
 });
 
-app.get('/test', (req, res) => {
-  res.json(userArr)
-})
 
 app.post("/checkout", async (req, res) => {
   try {
@@ -222,26 +223,44 @@ app.post("/checkout", async (req, res) => {
   } 
 });
 
-app.get("/success", async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-  const customer = await stripe.customers.retrieve(session.customer);
 
-  res.send(
-    `<html><body><h1>Thanks for your order, ${customer.name}!</h1></body></html>`
-  );
-});
-
-app.get("/checkout-session", async (req, res) => {
+app.get("/checkout/session", async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-    expand: ['line_items']
+    expand: ['line_items.data.price.product']
   });
 
-  if(session.payment_status == 'paid'){
-    res.json(session)
-  } else {
-    res.json('this was not paid!')
+  let orderTest = {
+    orderId: session.payment_intent,
+    customer_id: session.customer,
+    name: session.customer_details.name,
+    email: session.customer_details.email,
+    address:{
+      city: session.customer_details.address.city,
+      line1: session.customer_details.address.line1,
+      zip: session.customer_details.address.postal_code
+    },
+    total_amount: session.amount_total,
+    products: session.line_items.data
   }
-});
+
+  const foundOrder = orderArr.find(order => order.orderId == orderTest.orderId)
+
+  if(session.payment_status == 'paid' && !foundOrder){
+    res.json(session)
+    orderArr.push(orderTest);
+    orders = JSON.stringify(orderArr);
+    fs.writeFile("orders.json", orders, (err) => {  
+      if (err) throw err;
+      res.json("New order is added");
+    });
+  } else{
+    res.json('This order was already paid!')
+  
+  }
+  })
+  
+
+
 
 app.listen(port, () => {
   console.log("Server is running on port " + port);
