@@ -35,11 +35,12 @@ app.use(
 );
 
 app.get("/products", async (req, res) => {
-  const products = await stripe.products.list({});
+  const products = await stripe.products.list({
+    expand: ["data.default_price"],
+  });
 
   res.json(products);
 });
-
 
 app.get("/users", (req, res) => {
   res.json(users);
@@ -223,68 +224,62 @@ app.post("/checkout", async (req, res) => {
 
 app.get("/checkout/session", async (req, res) => {
   try {
-  const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-    expand: ["line_items.data.price.product"],
-  });
-
-  let paid = session.payment_status == "paid";
-
-  if (!paid) {
-    res.status(400)
-    throw new Error('Payment failed')
-    
-  }
-
-
-  let orderTest = {
-    orderId: session.payment_intent,
-    customer_id: session.customer,
-    name: session.shipping_details.name,
-    email: session.customer_details.email,
-    address: {
-      city: session.shipping_details.address.city,
-      line1: session.shipping_details.address.line1,
-      zip: session.shipping_details.address.postal_code,
-    },
-    total_amount: session.amount_total,
-    products: session.line_items.data,
-  };
-
-  const foundOrder = orderArr.find(
-    (order) => order.orderId == session.payment_intent
-  );
-
-  
-
-  if (!foundOrder) {
-    orderArr.push(orderTest);
-    orders = JSON.stringify(orderArr);
-    fs.writeFile("orders.json", orders, (err) => {
-      if (err) throw err;
+    const session = await stripe.checkout.sessions.retrieve(req.query.id, {
+      expand: ["line_items.data.price.product"],
     });
-    return res.json('Order saved!');
-  } else {
-    res.json('Order already placed!');
-  }
-} catch (err){
 
-  res.json(err)
-}
+    let paid = session.payment_status == "paid";
+
+    if (!paid) {
+      res.status(400);
+      throw new Error("Payment failed");
+    }
+
+    let orderTest = {
+      orderId: session.payment_intent,
+      customer_id: session.customer,
+      name: session.shipping_details.name,
+      email: session.customer_details.email,
+      address: {
+        city: session.shipping_details.address.city,
+        line1: session.shipping_details.address.line1,
+        zip: session.shipping_details.address.postal_code,
+      },
+      total_amount: session.amount_total,
+      products: session.line_items.data,
+    };
+
+    const foundOrder = orderArr.find(
+      (order) => order.orderId == session.payment_intent
+    );
+
+    if (!foundOrder) {
+      orderArr.push(orderTest);
+      orders = JSON.stringify(orderArr);
+      fs.writeFile("orders.json", orders, (err) => {
+        if (err) throw err;
+      });
+      return res.json("Order saved!");
+    } else {
+      res.json("Order already placed!");
+    }
+  } catch (err) {
+    res.json(err);
+  }
 });
 
 app.get("/get-order", async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req.query.id, {});
+  const session = await stripe.checkout.sessions.retrieve(req.query.id, {
+    expand: ["line_items.data.price.product"]
+  });
 
-  const foundOrder = orderArr.find(
-    (order) => order.orderId == session.payment_intent
-    );
-    
-    if (foundOrder) {
-      res.json(foundOrder);
-    } else {
-      res.status();
-    }
-    
+/*   const foundOrder = orderArr.find((order) => order.orderId == session.payment_intent);
+ */
+  if (session) {
+     res.json(session);
+  } 
+    /* res.status(405); */
+  
 });
 
 app.listen(port, () => {

@@ -4,10 +4,10 @@ let id = params.get("session_id");
 const init = async () => {
   try {
     let savedSessionStatus = await saveOrder();
-    let savedOrder = await getOrder();
-    appendOrder(savedOrder);
-    console.log(savedOrder);
     console.log(savedSessionStatus);
+    let savedOrder = await getOrder();
+    console.log(savedOrder);
+    /* appendOrder(savedOrder); */
   } catch (err) {
     console.log("CRASH");
   }
@@ -28,20 +28,18 @@ let saveOrder = async () => {
   }
 };
 
-async function getOrder() {
-  try {
+let getOrder = async () => {
+
     let response = await fetch("http://localhost:3000/get-order?id=" + id);
     return await response.json();
-  } catch (err) {
-    if (err.status == 408) {
+
+    /* if (err.status == 408) {
       throw err;
     } else if (err.status == 405) {
       console.log(err.message);
-    }
-  }
-}
-
-console.log(id);
+    
+  } */
+};
 
 function appendOrder(order) {
   const orderContainer = document.getElementById("orderContainer");
