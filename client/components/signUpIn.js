@@ -1,4 +1,3 @@
-
 let testRes = await checkLogIn()
 
 
@@ -274,7 +273,9 @@ userStuffCC.addEventListener('click',()=>{
     userStuff.style.display='none'
 })
 myOrder.addEventListener('click',()=>{
-    showShoppingCart()
+
+    window.location.href = "http://localhost:3000/myOrders.html"
+
 })
 async function makeRequest(url, method, body) {
     try {
