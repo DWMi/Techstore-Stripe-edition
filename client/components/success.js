@@ -1,4 +1,4 @@
-
+/* 
 fetch("http://localhost:3000/register", {
     method: "POST",
     headers: {
@@ -11,4 +11,4 @@ fetch("http://localhost:3000/register", {
     .then((data) => console.log(data))
     .then(setTimeout(() => {
         location.reload()
-    }, 1000))
+    }, 1000)) */

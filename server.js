@@ -273,12 +273,12 @@ app.get("/get-order", async (req, res) => {
     expand: ["line_items.data.price.product"]
   });
 
-/*   const foundOrder = orderArr.find((order) => order.orderId == session.payment_intent);
- */
-  if (session) {
-     res.json(session);
+  const foundOrder = orderArr.find((order) => order.orderId == session.payment_intent);
+
+  if (foundOrder) {
+     res.json(foundOrder);
   } 
-    /* res.status(405); */
+    res.status(405);
   
 });
 
