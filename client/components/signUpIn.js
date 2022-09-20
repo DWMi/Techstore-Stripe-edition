@@ -1,4 +1,3 @@
-
 let testRes = await checkLogIn()
 
 
@@ -18,24 +17,28 @@ async function checkLogIn() {
 }
 
 
-console.log(testRes)
+console.log(testRes.name)
 
 const rightItems = document.querySelector('.rightItems'),
-accountStuff = document.createElement('div'),
-signInBtn = document.createElement('div'),
-signUpBtn = document.createElement('div'),
-signOutBtn = document.createElement('div'),
-userBtn = document.createElement('div'),
-loginStuff = document.createElement('div'),
-myOrder = document.createElement('div'),
-userStuff = document.createElement('div'),
-userStuffCC = document.createElement('div'),
-userStuffClose = document.createElement('div')
+    accountStuff = document.createElement('div'),
+    signInBtn = document.createElement('div'),
+    signUpBtn = document.createElement('div'),
+    signOutBtn = document.createElement('div'),
+    userBtn = document.createElement('div'),
+    loginStuff = document.createElement('div'),
+    myOrder = document.createElement('div'),
+    userStuff = document.createElement('div'),
+    userStuffCC = document.createElement('div'),
+    userStuffClose = document.createElement('div'),
+    userNameCon = document.createElement('div'),
+    userName = document.createElement('h3')
 
 const main = document.querySelector('#main'),
     body = document.querySelector('body'),
     navbar = document.querySelector('.navbar')
 
+userNameCon.classList.add('userNameCon')
+userName.classList.add('userName')
 userStuffCC.classList.add('userStuffCC')
 userStuffClose.classList.add('userStuffClose')
 userStuff.classList.add('userStuff')
@@ -46,6 +49,7 @@ accountStuff.classList.add('accountStuff')
 signInBtn.classList.add('signInBtn')
 signUpBtn.classList.add('signUpBtn')
 signOutBtn.classList.add('signOutBtn')
+
 userBtn.innerHTML = '<i class="fa fa-user-circle" aria-hidden="true"></i>'  
 signInBtn.innerText = 'Sign In'
 signUpBtn.innerText = 'Sign Up'
@@ -53,11 +57,14 @@ signOutBtn.innerText = 'Logout'
 userStuffClose.innerText = '❌'
 userStuffClose.style.textAlign = 'right'
 myOrder.innerText = 'My Orders 🛒'
+userName.innerText = testRes.name
 
 rightItems.prepend(accountStuff)
+rightItems.prepend(userNameCon)
 accountStuff.append(userBtn)
 body.prepend(userStuff)
 userStuff.append(userStuffCC)
+userNameCon.append(userName)
 userStuffCC.append(userStuffClose)
 userStuff.append(myOrder)
 userStuff.append(loginStuff)
@@ -69,6 +76,7 @@ if(testRes.loggedIn) {
     loginStuff.removeChild(signInBtn)
     loginStuff.removeChild(signUpBtn)
 } else {
+    userNameCon.removeChild(userName)
     userStuff.removeChild(myOrder)
     loginStuff.removeChild(signOutBtn)
 }
@@ -256,6 +264,8 @@ const signInForm = ()=>{
 
         })
 }   
+
+
 signInBtn.addEventListener('click',signInForm)
 
 signUpBtn.addEventListener('click', signUpForm)
@@ -274,11 +284,13 @@ userBtn.addEventListener('click', ()=>{
     userStuff.style.display='flex'
     
 })
-userStuffCC.addEventListener('click',()=>{
+userStuffClose.addEventListener('click',()=>{
     userStuff.style.display='none'
 })
 myOrder.addEventListener('click',()=>{
-    showShoppingCart()
+
+    window.location.href = "http://localhost:3000/myOrders.html"
+
 })
 async function makeRequest(url, method, body) {
     try {
