@@ -282,6 +282,13 @@ app.get("/get-order", async (req, res) => {
   
 });
 
+app.get("/my-orders", (req, res)=>{
+  const myOrder = orderArr.find((order)=> order.customer_id == users.id)
+  if(myOrder){
+    res.json(myOrder)
+  }
+
+})
 app.listen(port, () => {
   console.log("Server is running on port " + port);
 });

@@ -30,12 +30,14 @@ const rightItems = document.querySelector('.rightItems'),
     userStuff = document.createElement('div'),
     userStuffCC = document.createElement('div'),
     userStuffClose = document.createElement('div'),
+    userNameCon = document.createElement('div'),
     userName = document.createElement('h3')
 
 const main = document.querySelector('#main'),
     body = document.querySelector('body'),
     navbar = document.querySelector('.navbar')
 
+userNameCon.classList.add('userNameCon')
 userName.classList.add('userName')
 userStuffCC.classList.add('userStuffCC')
 userStuffClose.classList.add('userStuffClose')
@@ -55,13 +57,14 @@ signOutBtn.innerText = 'Logout'
 userStuffClose.innerText = '❌'
 userStuffClose.style.textAlign = 'right'
 myOrder.innerText = 'My Orders 🛒'
-userName.innerText = `Welcome ${testRes.name}`
+userName.innerText = testRes.name
 
 rightItems.prepend(accountStuff)
+rightItems.prepend(userNameCon)
 accountStuff.append(userBtn)
 body.prepend(userStuff)
 userStuff.append(userStuffCC)
-userStuffCC.append(userName)
+userNameCon.append(userName)
 userStuffCC.append(userStuffClose)
 userStuff.append(myOrder)
 userStuff.append(loginStuff)
@@ -73,7 +76,7 @@ if(testRes.loggedIn) {
     loginStuff.removeChild(signInBtn)
     loginStuff.removeChild(signUpBtn)
 } else {
-    userStuffCC.removeChild(userName)
+    userNameCon.removeChild(userName)
     userStuff.removeChild(myOrder)
     loginStuff.removeChild(signOutBtn)
 }
