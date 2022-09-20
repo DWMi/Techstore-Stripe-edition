@@ -7,7 +7,7 @@ const init = async () => {
     console.log(savedSessionStatus);
     let savedOrder = await getOrder();
     console.log(savedOrder);
-    /* appendOrder(savedOrder); */
+    appendOrder(savedOrder);
   } catch (err) {
     console.log("CRASH");
   }
