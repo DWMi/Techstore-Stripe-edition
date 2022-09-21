@@ -16,17 +16,20 @@ if (localStorage.getItem('products')) {
 }
 
 /* Fetch data from the json file into a javascript object */
-fetch("http://localhost:3000/products")
-    .then(function (response) {
-        return response.json();
-    })
-    .then(function (data) {
-        itemsData = data;
-        console.log(itemsData)
-        createUIFromLoadedItemsData();
-        let totalQty = localStorage.getItem('quantity')
-        counter.innerText = totalQty
-    });
+const fetchProducts = async () => {
+
+   await fetch("http://localhost:3000/products")
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            itemsData = data;
+            console.log(itemsData)
+            createUIFromLoadedItemsData();
+            let totalQty = localStorage.getItem('quantity')
+            counter.innerText = totalQty
+        });
+}
 
 
 /* Use the data to create a list of these object on your website */
@@ -236,10 +239,11 @@ function createShoppingSummary() {
 
     return info;
 }
-setTimeout(() => {
+fetchProducts()
 
     if (window.location.href === "http://localhost:3000/cancel.html") {
-        window.location.href = "http://localhost:3000/"
-        console.log('url')
+        setTimeout(() => {
+             window.location.href = "http://localhost:3000/"
+             
+    }, 2500);
     }
-}, 1500);

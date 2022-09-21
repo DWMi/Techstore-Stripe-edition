@@ -30,4 +30,4 @@ GET http://localhost:3000/checkout/session
 
 ###
 
-GET http://localhost:3000/get-order
+GET http://localhost:3000/get-order?    

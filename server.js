@@ -1,12 +1,13 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import fetch from "node-fetch";
 import Stripe from "stripe";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 import cookieSession from "cookie-session";
 import bcrypt from "bcrypt";
 import * as fs from "fs";
+
+const nanoid = customAlphabet('1234567890', 10)
 
 let users = [];
 let userData = fs.readFileSync("users.json");
@@ -235,8 +236,11 @@ app.get("/checkout/session", async (req, res) => {
       throw new Error("Payment failed");
     }
 
+
     let orderTest = {
-      orderId: session.payment_intent,
+      orderNumber: nanoid(),
+      date: new Date().toISOString().split('T')[0],
+      orderId: session.id,
       customer_id: session.customer,
       name: session.shipping_details.name,
       email: session.customer_details.email,
@@ -250,7 +254,7 @@ app.get("/checkout/session", async (req, res) => {
     };
 
     const foundOrder = orderArr.find(
-      (order) => order.orderId == session.payment_intent
+      (order) => order.orderId == session.id
     );
 
     if (!foundOrder) {
@@ -273,18 +277,20 @@ app.get("/get-order", async (req, res) => {
     expand: ["line_items.data.price.product"]
   });
 
-  const foundOrder = orderArr.find((order) => order.orderId == session.payment_intent);
+  const foundOrder = orderArr.find((order) => order.orderId == session.id);
+
+  console.log(session);
 
   if (foundOrder) {
      res.json(foundOrder);
   } 
-    res.status(405);
+    res.status(500);
   
 });
 
 app.get("/my-orders/:id", (req, res)=>{
   let userId = req.params.id
-  const myOrder = orderArr.filter((order)=> order.customer_id == userId)
+  const myOrder = orderArr.filter((order) => order.customer_id == userId)
   if(myOrder){
     res.json(myOrder)
   }
