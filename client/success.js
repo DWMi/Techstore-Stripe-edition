@@ -9,7 +9,7 @@ const init = async () => {
     console.log(savedOrder);
     appendOrder(savedOrder);
   } catch (err) {
-    console.log("CRASH");
+    console.log(err);
   }
 };
 
@@ -29,16 +29,18 @@ let saveOrder = async () => {
 };
 
 let getOrder = async () => {
-
-    let response = await fetch("http://localhost:3000/get-order?id=" + id);
+  try {
+    let response = await fetch(
+      "http://localhost:3000/get-order?id=" + id
+    );
     return await response.json();
-
-    /* if (err.status == 408) {
+  } catch (err) {
+    if (err.status == 408) {
       throw err;
     } else if (err.status == 405) {
       console.log(err.message);
-    
-  } */
+    }
+  }
 };
 
 function appendOrder(order) {
