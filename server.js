@@ -80,7 +80,7 @@ app.post("/login", async (req, res) => {
     }
   }
 
-  res.status(401).json("Incorrect password");
+  res.status(401).json("Incorrect email or password..");
   return;
 });
 
@@ -94,7 +94,7 @@ app.delete("/logout", (req, res) => {
 app.post("/register", async (req, res) => {
   let userExist = userArr.find((user) => user.email == req.body.email);
   if (userExist) {
-    res.json("This user already exists! Choose another username..");
+    res.status(401).json("Email is invalid or already exists!");
     return;
   }
 
@@ -282,8 +282,9 @@ app.get("/get-order", async (req, res) => {
   
 });
 
-app.get("/my-orders", (req, res)=>{
-  const myOrder = orderArr.find((order)=> order.customer_id == users.id)
+app.get("/my-orders/:id", (req, res)=>{
+  let userId = req.params.id
+  const myOrder = orderArr.filter((order)=> order.customer_id == userId)
   if(myOrder){
     res.json(myOrder)
   }

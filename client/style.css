@@ -4,6 +4,11 @@ body {
     color: #fff;
     padding-top: 80px;
   }
+
+  .errorMsg {
+    color: red;
+    margin: 0;
+  }
   
   header {
     display: flex;
