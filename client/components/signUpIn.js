@@ -1,4 +1,4 @@
-let testRes = await checkLogIn()
+export let loggedInUser = await checkLogIn()
 
 async function checkLogIn() {
     let url = "http://localhost:3000/checkLogin"
@@ -9,7 +9,7 @@ async function checkLogIn() {
 }
 
 
-console.log(testRes)
+console.log(loggedInUser)
 
 const rightItems = document.querySelector('.rightItems'),
     accountStuff = document.createElement('div'),
@@ -49,7 +49,7 @@ signOutBtn.innerText = 'Logout'
 userStuffClose.innerText = '❌'
 userStuffClose.style.textAlign = 'right'
 myOrder.innerText = 'My Orders 🛒'
-userName.innerText = testRes.name
+userName.innerText = loggedInUser.name
 
 rightItems.prepend(accountStuff)
 rightItems.prepend(userNameCon)
@@ -64,7 +64,7 @@ loginStuff.append(signUpBtn)
 loginStuff.append(signInBtn)
 loginStuff.append(signOutBtn)
 
-if (testRes.loggedIn) {
+if (loggedInUser.loggedIn) {
     loginStuff.removeChild(signInBtn)
     loginStuff.removeChild(signUpBtn)
 } else {
@@ -275,7 +275,7 @@ signOutBtn.addEventListener('click', () => {
         .then(res => res.json())
         .then((data) => console.log(data))
     localStorage.clear()
-    location.reload()
+    window.location.href = 'http://localhost:3000'
 })
 
 userBtn.addEventListener('click', () => {

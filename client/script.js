@@ -1,4 +1,5 @@
 import { addToCart, removeFromCart } from "./localStorageFunctions.js";
+import { loggedInUser } from "./components/signUpIn.js";
 document.getElementById('shoppingCart').addEventListener('click', showShoppingCart)
 document.getElementById('titleHeader').addEventListener('click', createUIFromLoadedItemsData)
 let counter = document.querySelector("#counter");
@@ -70,7 +71,7 @@ function createListItem(product) {
 
     /* Button */
     var button = document.createElement("button");
-    button.innerHTML = '<i class="fa fa-cart-arrow-down" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Lägg till i kundvagnen";
+    button.innerHTML = '<i class="fa fa-cart-arrow-down" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Add to cart";
 
     button.onclick = function () {
         localStorage.setItem('products', JSON.stringify(shoppingCart))
@@ -98,7 +99,7 @@ function showShoppingCart() {
 
     /* Header */
     var header = document.createElement("h2");
-    header.innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i>' + " Kundvagn";
+    header.innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i>' + " Cart";
 
     /* Shopping list */
     var list = document.createElement("ul");
@@ -137,11 +138,11 @@ function createShoppingCartItem(product) {
 
     /* Qty */
     let qty = document.createElement('span')
-    qty.innerText = `Antal: ${product.qty}`
+    qty.innerText = `Quantity: ${product.qty}`
 
     /* Button */
     var button = document.createElement("button");
-    button.innerHTML = '<i class="fa fa-trash-o" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Ta bort";
+    button.innerHTML = '<i class="fa fa-trash-o" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Remove";
     button.onclick = function () {
         /* Remove the item from the array */
         shoppingCart = JSON.parse(localStorage.getItem('products'))
@@ -173,16 +174,33 @@ function createShoppingSummary() {
     for (var i = 0; i < shoppingCart.length; i++) {
         totalPrice += shoppingCart[i].price * shoppingCart[i].qty / 100;
     }
-    var priceLabel = document.createElement("h2");
-    priceLabel.innerText = "Totalt pris: " + totalPrice + " kr";
+
+    if(shoppingCart.length == 0) {
+        var priceLabel = document.createElement("h2");
+        priceLabel.innerText = 'Your cart is empty!';
+    } else {
+        var priceLabel = document.createElement("h2");
+        priceLabel.innerText = "Total price: " + totalPrice + " kr";
+    }
 
     /* Proceed button */
     var proceedButton = document.createElement("button");
-    proceedButton.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>' + "&nbsp;&nbsp;&nbsp;" + "Slutför ditt köp";
+    proceedButton.innerHTML = "Proceed to checkout" + "&nbsp;&nbsp;&nbsp;" + '<i class="fa fa-check" aria-hidden="true"></i>';
     proceedButton.onclick = function () {
         console.log(shoppingCart);
 
     };
+
+    if( shoppingCart.length == 0 ) {
+        proceedButton.style.display = 'none'
+    }
+
+    if(loggedInUser.loggedIn == false) {
+        proceedButton.disabled = true
+        proceedButton.style.opacity = '50%'
+        proceedButton.style.cursor = 'not-allowed'
+        proceedButton.innerText = 'Login to proceed to checkout'
+    }
 
     proceedButton.addEventListener("click", () => {
         console.log(shoppingCart);
