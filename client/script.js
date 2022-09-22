@@ -1,5 +1,5 @@
 import { addToCart, removeFromCart } from "./localStorageFunctions.js";
-import { loggedInUser } from "./components/signUpIn.js";
+import { loggedInUser } from "./components-js/signUpIn.js";
 document.getElementById('shoppingCart').addEventListener('click', showShoppingCart)
 document.getElementById('titleHeader').addEventListener('click', createUIFromLoadedItemsData)
 let counter = document.querySelector("#counter");
