@@ -241,9 +241,9 @@ function createShoppingSummary() {
 }
 fetchProducts()
 
-    if (window.location.href === "http://localhost:3000/cancel.html") {
+  /*   if (window.location.href === "http://localhost:3000/cancel.html") {
         setTimeout(() => {
              window.location.href = "http://localhost:3000/"
              
     }, 2500);
-    }
+    } */

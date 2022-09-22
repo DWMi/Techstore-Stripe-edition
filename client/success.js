@@ -18,9 +18,14 @@ let saveOrder = async () => {
     let response = await fetch(
       "http://localhost:3000/checkout/session?id=" + id
     );
-    return await response.json();
+    let result = await response.json();
+    if(response.status == 400) {
+      window.location.href = result
+    } else {
+      return result
+    }
   } catch (err) {
-    if (err.status == 408) {
+    if (err.status == 400) {
       throw err;
     } else if (err.status == 405) {
       console.log(err.message);

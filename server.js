@@ -220,6 +220,7 @@ app.post("/checkout", async (req, res) => {
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
+    
   }
 });
 
@@ -229,7 +230,7 @@ app.get("/checkout/session", async (req, res) => {
       expand: ["line_items.data.price.product"],
     });
 
-    let paid = session.payment_status == "paid";
+ let paid = session.payment_status == "paid"; 
 
     if (!paid) {
       res.status(400);
@@ -268,7 +269,8 @@ app.get("/checkout/session", async (req, res) => {
       res.json("Order already placed!");
     }
   } catch (err) {
-    res.json(err);
+    res.status(400).json("http://localhost:3000/cancel.html");
+   
   }
 });
 
@@ -278,8 +280,6 @@ app.get("/get-order", async (req, res) => {
   });
 
   const foundOrder = orderArr.find((order) => order.orderId == session.id);
-
-  console.log(session);
 
   if (foundOrder) {
      res.json(foundOrder);
