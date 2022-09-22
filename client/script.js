@@ -70,7 +70,7 @@ function createListItem(product) {
 
     /* Price */
     var price = document.createElement("span");
-    price.innerText = `${product.default_price.unit_amount / 100} kr`
+    price.innerText = `${product.default_price.unit_amount / 100},00 SEK`
 
     /* Button */
     var button = document.createElement("button");
@@ -137,7 +137,7 @@ function createShoppingCartItem(product) {
 
     /* Price */
     var price = document.createElement("span");
-    price.innerText = product.price / 100 * product.qty + " " + "kr"
+    price.innerText = product.price / 100 * product.qty + ",00 SEK"
 
     /* Qty */
     let qty = document.createElement('span')
@@ -183,7 +183,7 @@ function createShoppingSummary() {
         priceLabel.innerText = 'Your cart is empty!';
     } else {
         var priceLabel = document.createElement("h2");
-        priceLabel.innerText = "Total price: " + totalPrice + " kr";
+        priceLabel.innerText = "Total price: " + totalPrice + ",00 SEK";
     }
 
     /* Proceed button */
