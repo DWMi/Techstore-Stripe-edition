@@ -9,7 +9,6 @@ async function checkLogIn() {
 }
 
 
-console.log(loggedInUser)
 
 const rightItems = document.querySelector('.rightItems'),
     accountStuff = document.createElement('div'),
@@ -48,7 +47,7 @@ signUpBtn.innerText = 'Sign Up'
 signOutBtn.innerText = 'Logout'
 userStuffClose.innerText = '❌'
 userStuffClose.style.textAlign = 'right'
-myOrder.innerText = 'My Orders 🛒'
+myOrder.innerText = 'My Orders'
 userName.innerText = loggedInUser.name
 
 rightItems.prepend(accountStuff)
@@ -114,8 +113,10 @@ const signUpForm = () => {
 
     exitSignUpForm.innerText = '❌'
     signUpUsername.placeholder = 'Full name'
+    signUpUsername.pattern 
     signUpPassword.placeholder = 'Password'
     signUpEmail.placeholder = 'Email'
+    signUpEmail.pattern = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
     signUpAddress.placeholder = 'Address'
     signUpZip.placeholder = 'Zipcode'
     signUpEmail.type = 'email'
@@ -215,6 +216,7 @@ const signInForm = () => {
 
     exitSignInForm.innerText = '❌'
     signInUsername.placeholder = 'Email'
+    signInUsername.pattern = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
     signInPassword.placeholder = 'Password'
     signInPassword.type = 'Password'
     signInUsername.type = 'email'
