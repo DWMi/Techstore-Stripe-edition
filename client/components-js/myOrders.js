@@ -21,14 +21,24 @@ async function checkLogIn() {
   let url = "http://localhost:3000/checkLogin";
   let method = "GET";
   let result = await makeRequest(url, method, undefined);
+  console.log(result);
   return result;
 }
 
 const orderFetch = async (user) => {
   try {
     let response = await fetch(`http://localhost:3000/my-orders/${user.id}`);
-    let result = await response.json();
-    return result;
+    if (response.status === 401) {
+      orderTitle.innerText = '401 unauthorized'
+      orderSubTitle.innerText = ''
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 2000);
+    } else{
+      let result = await response.json();
+
+      return result;
+    }
   } catch (err) {
     console.error(err);
   }
@@ -92,24 +102,43 @@ function myOrders(element) {
   const orderContainerFooter = document.createElement('div')
   orderContainerFooter.classList.add('orderContainerFooter')
 
+  //  billing address
+  const billingDetails = document.createElement('div')
+  billingDetails.classList.add('billingDetails')
+
+  const billTo = document.createElement('h4')
+  billTo.innerText = 'Billing details:'
+
+  const billingName = document.createElement('p')
+  billingName.innerText = element.customer_id.name
+
+  const billingAddress = document.createElement('p')
+  billingAddress.innerText = element.billing_address.line1
+
+  const billingCity = document.createElement('p')
+  billingCity.innerText = element.billing_address.city
+
+  const billingZip = document.createElement('p')
+  billingZip.innerText = element.billing_address.postal_code
+
   // ship to
   const shippingDetails = document.createElement('div')
   shippingDetails.classList.add('shippingDetails')
 
   const addressText = document.createElement('h4')
-  addressText.innerText = 'Ship to:'
+  addressText.innerText = 'Shipping details:'
 
   const shippingName = document.createElement('p')
   shippingName.innerText = element.name
 
   const shippingAddress = document.createElement('p')
-  shippingAddress.innerText = element.address.line1
+  shippingAddress.innerText = element.shipping_address.line1
 
   const shippingCity = document.createElement('p')
-  shippingCity.innerText = element.address.city
+  shippingCity.innerText = element.shipping_address.city
 
   const shippingZip = document.createElement('p')
-  shippingZip.innerText = element.address.zip
+  shippingZip.innerText = element.shipping_address.zip
 
   /* Total amount */
 
@@ -120,8 +149,9 @@ function myOrders(element) {
 
   totalAmountContainer.append(totalAmount)
 
+  billingDetails.append(billTo, billingName, billingAddress, billingCity, billingZip)
   shippingDetails.append(addressText, shippingName, shippingAddress, shippingCity, shippingZip)
-  orderContainerFooter.append(shippingDetails, totalAmountContainer)
+  orderContainerFooter.append(billingDetails, shippingDetails, totalAmountContainer)
   orderContainerHeader.append(orderNumber, orderDate);
   orderContainer.append(orderContainerHeader)
   
@@ -152,6 +182,7 @@ function myOrders(element) {
     orderProductContainer.append(singleProduct, productQuantity, productPrice)
     orderContainer.append(orderProductContainer)
   });
+  
   container.append(orderContainer);
   orderContainer.append(orderContainerFooter)
 

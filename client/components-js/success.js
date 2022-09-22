@@ -20,6 +20,7 @@ let saveOrder = async () => {
     );
     let result = await response.json();
     if(response.status == 400) {
+      localStorage.clear()
       window.location.href = result
     } else {
       return result

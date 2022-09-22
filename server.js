@@ -7,7 +7,7 @@ import cookieSession from "cookie-session";
 import bcrypt from "bcrypt";
 import * as fs from "fs";
 
-const nanoid = customAlphabet('1234567890', 10)
+const nanoid = customAlphabet("1234567890", 10);
 
 let users = [];
 let userData = fs.readFileSync("users.json");
@@ -54,6 +54,11 @@ app.get("/checkLogin", (req, res) => {
       email: req.session.signedInUser.user.email,
       name: req.session.signedInUser.user.username,
       loggedIn: true,
+      address: {
+        line1: req.session.signedInUser.user.address,
+        city: req.session.signedInUser.user.city,
+        postal_code: req.session.signedInUser.user.zip,
+      },
     };
     res.json(user);
     return;
@@ -125,6 +130,11 @@ app.post("/register", async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPW,
+      address: {
+        line1: req.body.address,
+        city: req.body.city,
+        postal_code: req.body.zip,
+      },
     };
 
     userArr.push(user);
@@ -178,27 +188,6 @@ app.post("/checkout", async (req, res) => {
             },
           },
         },
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            fixed_amount: {
-              amount: 1500,
-              currency: "sek",
-            },
-            display_name: "Next day air",
-            // Delivers in exactly 1 business day
-            delivery_estimate: {
-              minimum: {
-                unit: "business_day",
-                value: 1,
-              },
-              maximum: {
-                unit: "business_day",
-                value: 1,
-              },
-            },
-          },
-        },
       ],
       line_items: req.body.shoppingCart.map((data) => {
         return {
@@ -217,35 +206,39 @@ app.post("/checkout", async (req, res) => {
       success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`, //add order
       cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
     });
+  
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
-    
   }
 });
 
 app.get("/checkout/session", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-      expand: ["line_items.data.price.product"],
+      expand: ["line_items.data.price.product", "customer"],
     });
 
- let paid = session.payment_status == "paid"; 
+    let paid = session.payment_status == "paid";
 
     if (!paid) {
       res.status(400);
       throw new Error("Payment failed");
     }
 
-
-    let orderTest = {
+    let newOrder = {
       orderNumber: nanoid(),
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       orderId: session.id,
       customer_id: session.customer,
       name: session.shipping_details.name,
       email: session.customer_details.email,
-      address: {
+      billing_address: {
+        city: session.customer.address.city,
+        line1: session.customer.address.line1,
+        postal_code: session.customer.address.postal_code,
+      },
+      shipping_address: {
         city: session.shipping_details.address.city,
         line1: session.shipping_details.address.line1,
         zip: session.shipping_details.address.postal_code,
@@ -254,12 +247,10 @@ app.get("/checkout/session", async (req, res) => {
       products: session.line_items.data,
     };
 
-    const foundOrder = orderArr.find(
-      (order) => order.orderId == session.id
-    );
+    const foundOrder = orderArr.find((order) => order.orderId == session.id);
 
     if (!foundOrder) {
-      orderArr.push(orderTest);
+      orderArr.push(newOrder);
       orders = JSON.stringify(orderArr);
       fs.writeFile("orders.json", orders, (err) => {
         if (err) throw err;
@@ -269,33 +260,40 @@ app.get("/checkout/session", async (req, res) => {
       res.json("Order already placed!");
     }
   } catch (err) {
-    res.status(400).json("http://localhost:3000/cancel.html");
-   
+    res.status(400).json('http://localhost:3000/cancel.html')
+    console.log('No session found');
   }
 });
 
 app.get("/get-order", async (req, res) => {
+  try{
   const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-    expand: ["line_items.data.price.product"]
+    expand: ["line_items.data.price.product", "customer"],
   });
 
   const foundOrder = orderArr.find((order) => order.orderId == session.id);
 
   if (foundOrder) {
-     res.json(foundOrder);
-  } 
-    res.status(500);
-  
+    res.json(foundOrder);
+  }
+}catch{
+  res.status(400).json('http://localhost:3000/cancel.html')
+  console.log('No order found');
+
+
+}
 });
 
-app.get("/my-orders/:id", (req, res)=>{
-  let userId = req.params.id
-  const myOrder = orderArr.filter((order) => order.customer_id == userId)
-  if(myOrder){
-    res.json(myOrder)
+app.get("/my-orders/:id", (req, res) => {
+  if (!req.session.signedInUser) {
+    res.status(401)
   }
-
-})
+  let userId = req.params.id;
+  const myOrder = orderArr.filter((order) => order.customer_id.id == userId);
+  if (myOrder) {
+    res.json(myOrder);
+  }
+});
 app.listen(port, () => {
   console.log("Server is running on port " + port);
 });

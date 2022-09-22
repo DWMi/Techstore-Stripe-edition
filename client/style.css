@@ -482,6 +482,21 @@ input:focus {
   font-weight: lighter;
 }
 
+.billingDetails{
+  display: flex;
+  flex-direction: column;
+  text-align: left !important;
+  gap: 5px;
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+
+}
+
+.billingDetails p{
+  margin: 0 !important;
+  font-weight: lighter;
+}
+
 .totalAmountContainer{
 align-items: center;
 margin: 0 !important;
