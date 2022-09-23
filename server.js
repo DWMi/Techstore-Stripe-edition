@@ -3,10 +3,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import Stripe from "stripe";
 import cookieSession from "cookie-session";
-import { router as stripeRouter } from './routers/stripe.js'
-import { orderArr } from './routers/stripe.js'
-import { router as userRouter } from './routers/user.js'
-
+import { router as stripeRouter } from "./routers/stripe.js";
+import { orderArr } from "./routers/stripe.js";
+import { router as userRouter } from "./routers/user.js";
 
 export const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY);
 
@@ -15,8 +14,8 @@ const port = 3000;
 const app = express();
 
 app.use(express.json());
-app.use("/stripe", stripeRouter)
-app.use("/user", userRouter)
+app.use("/stripe", stripeRouter);
+app.use("/user", userRouter);
 app.use("/", express.static("./client"));
 app.use(
   cookieSession({
@@ -40,7 +39,7 @@ app.get("/products", async (req, res) => {
 //Gets all orders for one Customer
 app.get("/my-orders/:id", (req, res) => {
   if (!req.session.signedInUser) {
-    res.status(401)
+    res.status(401);
   }
 
   let userId = req.params.id;
@@ -48,7 +47,6 @@ app.get("/my-orders/:id", (req, res) => {
   if (myOrder) {
     res.json(myOrder);
   }
-
 });
 
 app.listen(port, () => {

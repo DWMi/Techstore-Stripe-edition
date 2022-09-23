@@ -10,7 +10,7 @@ body {
   margin: 0;
 }
 
-#cancel{
+#cancel {
   color: black !important;
 }
 
@@ -406,7 +406,7 @@ input:focus {
 
 /* My Orders page */
 
-.container{
+.container {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -438,11 +438,11 @@ input:focus {
   width: auto;
 }
 
-.productDescription{
-  margin: 0  !important;
+.productDescription {
+  margin: 0 !important;
 }
 
-.singleProduct{
+.singleProduct {
   border: black 1px solid;
   border-radius: 10px;
   margin: 0 10px;
@@ -457,7 +457,7 @@ input:focus {
   justify-content: space-between;
 }
 
-.orderContainerFooter{
+.orderContainerFooter {
   border-top: black 1px solid;
   margin-bottom: 5px !important;
   display: flex;
@@ -466,40 +466,35 @@ input:focus {
   justify-content: space-between;
 }
 
-
-.shippingDetails{
+.shippingDetails {
   display: flex;
   flex-direction: column;
   text-align: left !important;
   gap: 5px;
   margin-top: 15px !important;
   margin-bottom: 15px !important;
-
 }
 
-.shippingDetails p{
+.shippingDetails p {
   margin: 0 !important;
   font-weight: lighter;
 }
 
-.billingDetails{
+.billingDetails {
   display: flex;
   flex-direction: column;
   text-align: left !important;
   gap: 5px;
   margin-top: 15px !important;
   margin-bottom: 15px !important;
-
 }
 
-.billingDetails p{
+.billingDetails p {
   margin: 0 !important;
   font-weight: lighter;
 }
 
-.totalAmountContainer{
-align-items: center;
-margin: 0 !important;
+.totalAmountContainer {
+  align-items: center;
+  margin: 0 !important;
 }
-
-

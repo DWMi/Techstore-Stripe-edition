@@ -1,13 +1,2 @@
 [
-    {
-        "id": "cus_MTmljxhEOQM4mo",
-        "username": "Julle bulle",
-        "email": "julius@gmail.com",
-        "password": "$2b$10$VMDdNvnmZbZHtXksaycwtuN/r/qIfbptIAZ7b8fDUezYtxuUbyvCm",
-        "address": {
-            "line1": "myråsgatan 15",
-            "city": "Borås",
-            "postal_code": "50733"
-        }
-    }
 ]

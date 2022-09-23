@@ -1,18 +1,18 @@
-import express from 'express'
+import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import { stripe } from '../server.js'
-import * as fs from "fs"
+import { stripe } from "../server.js";
+import * as fs from "fs";
 import cookieSession from "cookie-session";
 import { customAlphabet } from "nanoid";
 
 const nanoid = customAlphabet("1234567890", 10);
 
-export const router = express.Router()
+export const router = express.Router();
 
-let orders = []
-let orderData = fs.readFileSync('orders.json')
-export let orderArr = JSON.parse(orderData)
+let orders = [];
+let orderData = fs.readFileSync("orders.json");
+export let orderArr = JSON.parse(orderData);
 
 router.use(
   cookieSession({
@@ -24,12 +24,11 @@ router.use(
   })
 );
 
-
 router.post("/checkout", async (req, res) => {
   try {
-    if(!req.session.signedInUser) {
-      res.status(401).json('Not allowed!')
-      return
+    if (!req.session.signedInUser) {
+      res.status(401).json("Not allowed!");
+      return;
     }
     const session = await stripe.checkout.sessions.create({
       customer: req.session.signedInUser.user.id,
@@ -47,7 +46,6 @@ router.post("/checkout", async (req, res) => {
               currency: "sek",
             },
             display_name: "Free shipping",
-            // Delivers between 5-7 business days
             delivery_estimate: {
               minimum: {
                 unit: "business_day",
@@ -75,10 +73,10 @@ router.post("/checkout", async (req, res) => {
         };
       }),
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`, //add order
+      success_url: `${process.env.CLIENT_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
     });
-  
+
     res.json({ url: session.url });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -132,24 +130,24 @@ router.get("/checkout/session", async (req, res) => {
       res.json("Order already placed!");
     }
   } catch (err) {
-    res.status(400).json('http://localhost:3000/cancel.html')
-    console.log('No session found');
+    res.status(400).json("http://localhost:3000/error.html");
+    console.log("No session found");
   }
 });
 
 router.get("/get-order", async (req, res) => {
-  try{
-  const session = await stripe.checkout.sessions.retrieve(req.query.id, {
-    expand: ["line_items.data.price.product", "customer"],
-  });
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.query.id, {
+      expand: ["line_items.data.price.product", "customer"],
+    });
 
-  const foundOrder = orderArr.find((order) => order.orderId == session.id);
+    const foundOrder = orderArr.find((order) => order.orderId == session.id);
 
-  if (foundOrder) {
-    res.json(foundOrder);
+    if (foundOrder) {
+      res.json(foundOrder);
+    }
+  } catch {
+    res.status(400).json("http://localhost:3000/cancel.html");
+    console.log("No order found");
   }
-}catch{
-  res.status(400).json('http://localhost:3000/cancel.html')
-  console.log('No order found');
-}
 });
