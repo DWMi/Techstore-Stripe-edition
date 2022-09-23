@@ -17,11 +17,11 @@ let saveOrder = async () => {
       "http://localhost:3000/stripe/checkout/session?id=" + id
     );
     let result = await response.json();
-    if(response.status == 400) {
-      localStorage.clear()
-      window.location.href = result
+    if (response.status == 400) {
+      localStorage.clear();
+      window.location.href = result;
     } else {
-      return result
+      return result;
     }
   } catch (err) {
     if (err.status == 400) {

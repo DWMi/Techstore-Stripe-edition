@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" />
-    <title>Cancel</title>
+    <title>Error</title>
   </head>
   <body>
     <header class="navbar">
@@ -18,12 +18,15 @@
       </div>
     </header>
     <div id="main">
-      <h2 id="cancel">TRANSACTION CANCELED!</h2>
+      <h2 id="cancel">
+        SOMETHING WENT WRONG! <br />
+        Rediricting to home page...
+      </h2>
     </div>
   </body>
   <script>
     setTimeout(() => {
       window.location.href = "http://localhost:3000/";
-    }, 2000);
+    }, 2500);
   </script>
 </html>

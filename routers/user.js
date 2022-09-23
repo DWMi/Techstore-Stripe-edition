@@ -1,18 +1,17 @@
-import express from 'express'
+import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import { stripe } from '../server.js'
-import * as fs from "fs"
+import { stripe } from "../server.js";
+import * as fs from "fs";
 import cookieSession from "cookie-session";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 
+export const router = express.Router();
 
-export const router = express.Router()
-
-let users = []
-let userData = fs.readFileSync('users.json')
-let userArr = JSON.parse(userData)
+let users = [];
+let userData = fs.readFileSync("users.json");
+let userArr = JSON.parse(userData);
 
 router.use(
   cookieSession({
@@ -98,7 +97,6 @@ router.post("/login", async (req, res) => {
         user: foundUser,
         date: new Date(),
       };
-      console.log(req.session);
       res.status(200).json("Successful signed in!");
       return;
     }
@@ -126,7 +124,6 @@ router.get("/checkLogin", (req, res) => {
   }
   res.json({ loggedIn: false });
 });
-
 
 router.delete("/logout", (req, res) => {
   if (req.session) {
