@@ -1,14 +1,5 @@
+import { checkLogIn } from "./commonFunctions.js"
 export let loggedInUser = await checkLogIn()
-
-async function checkLogIn() {
-    let url = "http://localhost:3000/checkLogin"
-    let method = "GET"
-    let result = await makeRequest(url, method, undefined)
-    return result;
-
-}
-
-
 
 const rightItems = document.querySelector('.rightItems'),
     accountStuff = document.createElement('div'),
@@ -109,11 +100,11 @@ const signUpForm = () => {
     signUpForm.append(exitSignUpFormCon)
     exitSignUpFormCon.append(exitSignUpForm)
     signUpForm.append(signUpUsername, signUpPassword, signUpEmail, signUpAddress, signUpZip, signUpCity, errorMsg, signUpSubmitBtn)
- 
+
 
     exitSignUpForm.innerText = '❌'
     signUpUsername.placeholder = 'Full name'
-    signUpUsername.pattern 
+    signUpUsername.pattern
     signUpPassword.placeholder = 'Password'
     signUpEmail.placeholder = 'Email'
     signUpEmail.pattern = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
@@ -156,7 +147,7 @@ const signUpForm = () => {
             zip: signUpZip.value
         }
         try {
-            let response = await fetch("http://localhost:3000/register", {
+            let response = await fetch("http://localhost:3000/user/register", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -177,8 +168,8 @@ const signUpForm = () => {
             console.error(err);
         }
 
-        
-      
+
+
 
     })
 
@@ -242,7 +233,7 @@ const signInForm = () => {
         }
 
         try {
-            let response = await fetch("http://localhost:3000/login", {
+            let response = await fetch("http://localhost:3000/user/login", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -271,7 +262,7 @@ signInBtn.addEventListener('click', signInForm)
 signUpBtn.addEventListener('click', signUpForm)
 
 signOutBtn.addEventListener('click', () => {
-    fetch("http://localhost:3000/logout", {
+    fetch("http://localhost:3000/user/logout", {
         method: "DELETE",
     })
         .then(res => res.json())
@@ -292,19 +283,3 @@ myOrder.addEventListener('click', () => {
     window.location.href = "http://localhost:3000/myOrders.html"
 
 })
-async function makeRequest(url, method, body) {
-    try {
-        let response = await fetch(url, {
-            method,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body
-        })
-        let result = await response.json()
-        return result;
-
-    } catch (err) {
-        console.error(err);
-    }
-}

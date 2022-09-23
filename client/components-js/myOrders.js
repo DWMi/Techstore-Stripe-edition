@@ -1,14 +1,17 @@
+import { checkLogIn } from "./commonFunctions.js";
+
 const main = document.querySelector("#main"),
 titleHeader = document.querySelector("#titleHeader"),
 orderTitle = document.createElement("h2"),
 orderSubTitle = document.createElement("h1"),
-container = document.createElement("div")
-
-orderTitle.innerText = "My Orders"
-
-container.classList.add('container')
-
-
+  container = document.createElement("div")
+  container.classList.add('container')
+  
+  orderTitle.innerText = "My Orders"
+  
+  titleHeader.addEventListener("click", () => {
+    window.location.href = "http://localhost:3000";
+  });
 
 
 const init = async () => {
@@ -17,13 +20,6 @@ const init = async () => {
   await renderOrders(order);
 };
 
-async function checkLogIn() {
-  let url = "http://localhost:3000/checkLogin";
-  let method = "GET";
-  let result = await makeRequest(url, method, undefined);
-  console.log(result);
-  return result;
-}
 
 const orderFetch = async (user) => {
   try {
@@ -34,7 +30,7 @@ const orderFetch = async (user) => {
       setTimeout(() => {
         window.location.href = '/'
       }, 2000);
-    } else{
+    } else {
       let result = await response.json();
 
       return result;
@@ -57,30 +53,13 @@ async function renderOrders(order) {
       window.location.href = '/'
     })
     container.append(goBackHome)
-  }else{
-   
-
+  } else {
     order.forEach((element) => {
       myOrders(element);
     });
   }
 }
 
-export async function makeRequest(url, method, body) {
-  try {
-    let response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body,
-    });
-    let result = await response.json();
-    return result;
-  } catch (err) {
-    console.error(err);
-  }
-}
 
 function myOrders(element) {
   const orderContainer = document.createElement("div");
@@ -145,7 +124,7 @@ function myOrders(element) {
   const totalAmountContainer = document.createElement('div')
   totalAmountContainer.classList.add('totalAmountContainer')
   const totalAmount = document.createElement('p')
-  totalAmount.innerText = 'Total: ' + element.total_amount/100 + ',00 SEK'
+  totalAmount.innerText = 'Total: ' + element.total_amount / 100 + ',00 SEK'
 
   totalAmountContainer.append(totalAmount)
 
@@ -154,7 +133,7 @@ function myOrders(element) {
   orderContainerFooter.append(billingDetails, shippingDetails, totalAmountContainer)
   orderContainerHeader.append(orderNumber, orderDate);
   orderContainer.append(orderContainerHeader)
-  
+
   element.products.forEach((product) => {
     // create the container for each product ordered
     const orderProductContainer = document.createElement("div");
@@ -177,12 +156,12 @@ function myOrders(element) {
     // create the p tag for the price of the single product
     const productPrice = document.createElement('p')
     productPrice.classList.add('productPrice')
-    productPrice.innerText = 'Price: ' + product.price.unit_amount/100 + ',00 SEK'
+    productPrice.innerText = 'Price: ' + product.price.unit_amount / 100 + ',00 SEK'
     singleProduct.append(productImg, productDescription)
     orderProductContainer.append(singleProduct, productQuantity, productPrice)
     orderContainer.append(orderProductContainer)
   });
-  
+
   container.append(orderContainer);
   orderContainer.append(orderContainerFooter)
 
@@ -190,6 +169,3 @@ function myOrders(element) {
 
 window.addEventListener("load", init);
 
-titleHeader.addEventListener("click", () => {
-  window.location.href = "http://localhost:3000";
-});

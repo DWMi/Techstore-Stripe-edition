@@ -4,9 +4,7 @@ let id = params.get("session_id");
 const init = async () => {
   try {
     let savedSessionStatus = await saveOrder();
-    console.log(savedSessionStatus);
     let savedOrder = await getOrder();
-    console.log(savedOrder);
     appendOrder(savedOrder);
   } catch (err) {
     console.log(err);
@@ -16,7 +14,7 @@ const init = async () => {
 let saveOrder = async () => {
   try {
     let response = await fetch(
-      "http://localhost:3000/checkout/session?id=" + id
+      "http://localhost:3000/stripe/checkout/session?id=" + id
     );
     let result = await response.json();
     if(response.status == 400) {
@@ -37,7 +35,7 @@ let saveOrder = async () => {
 let getOrder = async () => {
   try {
     let response = await fetch(
-      "http://localhost:3000/get-order?id=" + id
+      "http://localhost:3000/stripe/get-order?id=" + id
     );
     return await response.json();
   } catch (err) {
